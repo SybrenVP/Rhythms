@@ -1,0 +1,12 @@
+RHYTHM editor
+------------
+1. Functionality: 
+	- A plug and play rhythm handler which can help create simple rhythm games //
+	- Beat-actions: 
+		1. BeatLerp //
+		2. *Do* on beat //
+	- Create Rhythm sequences, by recording from editor //
+	- Sequence-actions:
+		1. Instantiate on sequence event//
+		2. Destroy on sequence event//
+	- Sequence editor; Edit your recorded sequences with a visual editor //

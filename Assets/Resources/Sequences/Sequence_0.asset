@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db82d7b8f2df8d94caa9b394b2c5681c, type: 3}
+  m_Name: Sequence_0
+  m_EditorClassIdentifier: 
+  Song: {fileID: 8300000, guid: fd0a8de410b8fbb4eaf648fcecf073c1, type: 3}
+  Loop: 1
+  Bpm: 120
+  SongOffset: 0
+  EventPositions:
+  - 2
+  - 4
+  - 6
+  - 8
+  - 10
+  - 12
+  - 14
+  - 16
+  - 18
+  - 20
+  - 22
+  - 24
+  - 26
+  - 28
+  - 30
+  - 32
+  - 34
+  - 36
+  - 38
+  - 40
+  - 42
+  - 44
+  - 46
+  - 48
+  - 50
+  - 52
+  - 54
+  - 56
+  - 58
+  - 60
