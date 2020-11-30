@@ -100,6 +100,13 @@ public class SequenceEditor : EditorWindow
                 _movingEvent = -1;
                 _active.ReorderEvents();
                 break;
+            case EventType.MouseDown:
+                if (_movingEvent < 0)
+                {
+                    _progress = (int)e.mousePosition.x / _widthPerSec;
+                    RedrawImage();
+                }
+                break;
             case EventType.KeyUp:
                 if (_recording && e.keyCode == KeyCode.Space)
                     _active.AddEvent(Mathf.Round(((_progress * _widthPerSec) / _widthPerBeat) * 2 / 1) * 1 / 2);
@@ -107,6 +114,13 @@ public class SequenceEditor : EditorWindow
                 {
                     _active.EventPositions.RemoveAt(_movingEvent);
                     _movingEvent = -1;
+                }
+                if (e.keyCode == KeyCode.P)
+                    StartClip();
+                if (e.keyCode == KeyCode.K)
+                {
+                    AudioUtility.StopAllClips();
+                    _isPlaying = false;
                 }
                 break;
         }
@@ -154,9 +168,11 @@ public class SequenceEditor : EditorWindow
 
         #region Visual progress while playing
 
+        EditorGUI.DrawRect(new Rect(0f, position.size.y - _tex.height, _progress * _widthPerSec, _tex.height), new Color(0.7f, 0.7f, 0.7f, 0.5f));
+
         if (_isPlaying)
         {
-            EditorGUI.DrawRect(new Rect(0f, position.size.y - _tex.height, _progress * _widthPerSec, _tex.height), new Color(0.7f, 0.7f, 0.7f, 0.5f));
+            //EditorGUI.DrawRect(new Rect(0f, position.size.y - _tex.height, _progress * _widthPerSec, _tex.height), new Color(0.7f, 0.7f, 0.7f, 0.5f));
             if (_progress >= _active.Song.length)
             {
                 _isPlaying = false;
@@ -191,7 +207,7 @@ public class SequenceEditor : EditorWindow
 
         if (_foldOutOpen && GUI.Button(new Rect(_sideOffset + _buttonSize * 2, position.size.y - _buttonSize - _sideOffset, _buttonSize, _buttonSize), new GUIContent(_pauseButtonTex)))
         {
-            SequenceUtilities.StopClip(_active.Song);
+            AudioUtility.StopAllClips();
             _isPlaying = false;
             _recording = false;
             return;
@@ -253,8 +269,15 @@ public class SequenceEditor : EditorWindow
 
     private void StartClip()
     {
-        SequenceUtilities.PlayClip(_active.Song);
-        _startTime = Time.realtimeSinceStartup;
+        //Calculate the startSample
+        int startSample = 0;
+        float percentage = _progress / _active.Song.length;
+        int amtSamples = _active.Song.samples * _active.Song.channels;
+        startSample = (int)(percentage * amtSamples);
+
+        AudioUtility.PlayClip(_active.Song, 0, false);
+        AudioUtility.SetClipSamplePosition(_active.Song, startSample);
+        _startTime = Time.realtimeSinceStartup - _progress;
         _isPlaying = true;
     }
 }
