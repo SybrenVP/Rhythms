@@ -358,9 +358,7 @@ MonoBehaviour:
   Tracks:
   - {fileID: 703505048}
   - {fileID: 1575857461}
-  - {fileID: 1442186379}
-  - {fileID: 797067326}
-  - {fileID: 1796346874}
+  - {fileID: 728253364}
   Variables: {fileID: 1436749360}
 --- !u!114 &475105237
 MonoBehaviour:
@@ -727,7 +725,7 @@ MonoBehaviour:
     - {fileID: 475105237}
     - {fileID: 1055084401}
   Active: 0
---- !u!114 &797067326
+--- !u!114 &728253364
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1269,6 +1267,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Values: []
+--- !u!114 &1416671859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f5a74b4b11bbc549a8adbf4ba5d6350, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Actions: []
 --- !u!114 &1436749360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1291,23 +1302,6 @@ MonoBehaviour:
   - {fileID: 1204996307}
   - {fileID: 1023315650}
   - {fileID: 1081879043}
---- !u!114 &1442186379
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 553a7cc127d68ec489bf2d03e684ef11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ActiveOnStart: 0
-  States:
-    keys: 
-    values: []
-  Active: 0
 --- !u!114 &1575857461
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1322,8 +1316,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ActiveOnStart: 0
   States:
-    keys: 
-    values: []
+    keys: 0f000000
+    values:
+    - {fileID: 1416671859}
   Active: 0
 --- !u!114 &1596850211
 MonoBehaviour:
@@ -1437,23 +1432,6 @@ MonoBehaviour:
   TempName: ThisIsAFloat
   EditingValue: 0
   Value: 69.3
---- !u!114 &1796346874
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 553a7cc127d68ec489bf2d03e684ef11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ActiveOnStart: 0
-  States:
-    keys: 
-    values: []
-  Active: 0
 --- !u!114 &1857399867
 MonoBehaviour:
   m_ObjectHideFlags: 0

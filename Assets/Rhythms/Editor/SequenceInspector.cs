@@ -59,7 +59,7 @@ namespace Rhythms_Editor
             {
                 //State inspector
                 case 0:
-                    DrawStateInspector(StateDrawer.SelectedState);
+                    DrawStateInspector(_editor.SelectedState);
                     break;
 
                 //Variable inspector
@@ -181,7 +181,7 @@ namespace Rhythms_Editor
 
         private void RemoveAction(object action)
         {
-            StateDrawer.SelectedState.Actions.Remove((Rhythms.RhythmAction)action);
+            _editor.SelectedState.Actions.Remove((Rhythms.RhythmAction)action);
         }
 
         protected void OnActionAdded(System.Type type, Rhythms.RhythmState state)

@@ -138,14 +138,6 @@ namespace Rhythms_Editor
 
         #endregion
 
-        public void Repaint(ref bool refresh)
-        {
-            foreach (StateDrawer stateDrawer in _stateDrawers)
-            {
-                stateDrawer.Update(ref refresh);
-            }
-        }
-
         #region WindowDrawing
 
         public void OnGUI()
@@ -315,8 +307,7 @@ namespace Rhythms_Editor
             {
                 if (Track.States[newBeatPos] != state)
                 {
-                    Debug.Log(_editor.ActiveSequence.Tracks.IndexOf(Track));
-                    Toolbar.SetErrorMessage("Cannot move here", 2f);
+                    Debug.LogWarning("Unable to move here");
                     return false;
                 }
                 else
@@ -389,6 +380,11 @@ namespace Rhythms_Editor
         public float GetXForBeat(int beat)
         {
             return (WidthPerBeat * beat) - ScrollPosition.x;
+        }
+
+        public StateDrawer GetStateForBeat(int beat)
+        {
+            return _stateDrawers.Find(drawer => drawer.Beat == beat);
         }
 
         #endregion

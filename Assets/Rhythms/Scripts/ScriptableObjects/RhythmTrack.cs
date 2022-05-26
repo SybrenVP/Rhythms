@@ -32,5 +32,16 @@ namespace Rhythms
                 }
             }
         }
+
+        public int GetBeatForState(RhythmState state)
+        {
+            foreach (int key in States.Keys)
+            {
+                if (States[key] == state)
+                    return key;
+            }
+
+            return -1;
+        }
     }
 }

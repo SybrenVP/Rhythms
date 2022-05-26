@@ -36,6 +36,13 @@ namespace Rhythms_Editor
 
         #endregion
 
+        #region States
+
+        private StateDrawer _selectedState = null;
+        public Rhythms.RhythmState SelectedState { get => _selectedState.State; }
+
+        #endregion
+
         #region InputState
 
         private enum InputState
@@ -45,6 +52,7 @@ namespace Rhythms_Editor
             ResizeState,
             SelectStates,
         }
+
         private InputState _currentInputState = InputState.ControlTimeline;
         private bool _inputStateActive = false;
 
@@ -100,7 +108,7 @@ namespace Rhythms_Editor
             {
                 if (ActiveSequence.Tracks[i] == null)
                 {
-                    Toolbar.SetErrorMessage("Corrupt sequence, destroying tracks :(", 2f);
+                    Debug.LogWarning("Corrupt sequence, destroying tracks :(");
                     ActiveSequence.Tracks.Clear();
                     Timelines.Clear();
 
@@ -200,12 +208,7 @@ namespace Rhythms_Editor
         }
 
         protected void OnTryRepaint()
-        {
-            foreach (TrackTimeline timeline in Timelines)
-            {
-                timeline.Repaint(ref _refresh);
-            }
-
+        { 
             if (!_refresh)
                 return;
 
@@ -312,6 +315,7 @@ namespace Rhythms_Editor
                             _owningTimelineOfInput.Scroll(-diff.x);
 
                             _lastMousePos = e.mousePosition;
+                            _refresh = true;
                         }
                     }
                     break;
@@ -380,14 +384,23 @@ namespace Rhythms_Editor
                     {
                         if (!_inputStateActive)
                         {
-                            //get the owning timeline of this input position
+                            //Get the owning timeline
                             _owningTimelineOfInput = TrackTimeline.FindOwningTimeline(this, e.mousePosition);
-                            _inputStateActive = true;
+                            //Convert the mouse pos to the beat pos on this timeline
+                            int beat = _owningTimelineOfInput.GetBeatForPosition(e.mousePosition);
+                            //Get the state responsible for this beat
+                            StateDrawer stateDrawer = _owningTimelineOfInput.GetStateForBeat(beat);
+                            //Check if the click was within the View of the stateDrawer
+                            if (stateDrawer != null && stateDrawer.View.Contains(e.mousePosition))
+                            {
+                                _inputStateActive = true;
+                                _lastMousePos = e.mousePosition;
 
-                            _lastMousePos = e.mousePosition;
+                                _selectedState = stateDrawer;
 
-                            GUIUtility.hotControl = controlID;
-                            e.Use();
+                                GUIUtility.hotControl = controlID;
+                                e.Use();
+                            }
                         }
                     }
                     break;
@@ -397,6 +410,11 @@ namespace Rhythms_Editor
                     {
                         if (_inputStateActive)
                         {
+                            _selectedState.SetBeat(_owningTimelineOfInput.GetBeatForPosition(e.mousePosition));
+                            if (!_owningTimelineOfInput.MoveStateTo(_selectedState.State, _selectedState.Beat))
+                            {
+                                _selectedState.SetBeat(_owningTimelineOfInput.Track.GetBeatForState(_selectedState.State));
+                            }
                             _owningTimelineOfInput = null;
                             _inputStateActive = false;
                         }
@@ -412,8 +430,25 @@ namespace Rhythms_Editor
                     {
                         if (_inputStateActive)
                         {
-                            Vector2 diff = e.mousePosition - _lastMousePos;
-                            _owningTimelineOfInput.Scroll(-diff.x);
+                            bool currentTimeline = _owningTimelineOfInput.View.Contains(e.mousePosition);
+                            if (!currentTimeline)
+                            {
+                                //Get the timeline it belongs to now and cache the old timeline
+                                TrackTimeline newTimeline = TrackTimeline.FindOwningTimeline(_owningTimelineOfInput, e.mousePosition);
+                                if (newTimeline != null)
+                                {
+                                    _owningTimelineOfInput.DeleteState(_selectedState.Beat);
+
+                                    _owningTimelineOfInput = newTimeline;
+                                    _selectedState.OwningTimeline = _owningTimelineOfInput;
+
+                                    _owningTimelineOfInput.AcceptState(_selectedState);
+                                    _selectedState.SetView();
+                                }
+                            }
+
+                            _selectedState.SetBeat(_owningTimelineOfInput.GetBeatForPosition(e.mousePosition));
+                            _owningTimelineOfInput.MoveStateTo(_selectedState.State, _selectedState.Beat);
 
                             _lastMousePos = e.mousePosition;
                         }
