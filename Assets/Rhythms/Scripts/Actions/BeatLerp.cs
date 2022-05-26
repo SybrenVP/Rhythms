@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Rhythms
 {
+    //Example action
     public class BeatLerp : RhythmAction
     {
         public R_Bool UseStateLength = new R_Bool(true);

@@ -3,7 +3,9 @@ using UnityEditor;
 
 namespace Rhythms_Editor
 {
-
+    /// <summary>
+    /// Adds some visual information in the Unity inspector, useful for designers / debugging
+    /// </summary>
     [CustomEditor(typeof(Rhythms.RhythmController))]
     public class RhythmControllerEditor : Editor
     {

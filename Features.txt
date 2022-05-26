@@ -47,3 +47,5 @@ Priority list Rhythms
 9. Expand library of actions 
 	a. Track control (being able to enable/disable tracks)
 
+10. Search actions in the toolbar on the right
+

@@ -17,6 +17,7 @@ namespace Rhythms
 
         [HideInInspector, SerializeField] public bool Active = false;
 
+        //Allows us to disable and enable tracks at runtime, kind of like making a choice in a story game
         public void SetActive(bool active)
         {
             Active = active;
@@ -28,10 +29,14 @@ namespace Rhythms
             {
                 if (States.ContainsKey(beatNumber))
                 {
-                    States[beatNumber].Start();
+                    States[beatNumber].Start(); 
                 }
+
+                //TODO: Some states are longer than 1 beat, meaning they get to update multiple times
             }
         }
+
+        #region Accessors
 
         public int GetBeatForState(RhythmState state)
         {
@@ -43,5 +48,7 @@ namespace Rhythms
 
             return -1;
         }
+
+        #endregion
     }
 }

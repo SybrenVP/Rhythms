@@ -42,9 +42,6 @@ namespace Rhythms_Editor
 
         private Color _backgroundColor = new Color(0.1f, 0.1f, 0.1f, 1f);
 
-        private static string _errorMessage = "";
-        private static float _errorMessageEndTime = 0f;
-
         private static readonly float BUTTON_WIDTH = 45f;
 
         public Toolbar(RhythmSequenceEditor editor)
@@ -157,12 +154,6 @@ namespace Rhythms_Editor
                 }
             }
             EditorGUILayout.EndHorizontal();
-        }
-
-        public static void SetErrorMessage(string message, float time)
-        {
-            _errorMessage = message;
-            _errorMessageEndTime = Time.realtimeSinceStartup + time;
         }
     }
 }

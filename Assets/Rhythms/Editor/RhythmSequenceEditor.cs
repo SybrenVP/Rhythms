@@ -6,6 +6,9 @@ using UnityEditor.SceneManagement;
 
 namespace Rhythms_Editor
 {
+    /// <summary>
+    /// The main power source of the rhythms engine. This is the editor window for the rhythm editor, combines the timeline views with inspector and toolbars. 
+    /// </summary>
     public class RhythmSequenceEditor : EditorWindow
     {
         public Rhythms.RhythmSequence ActiveSequence = null;
@@ -39,7 +42,7 @@ namespace Rhythms_Editor
         #region States
 
         private StateDrawer _selectedState = null;
-        public Rhythms.RhythmState SelectedState { get => _selectedState.State; }
+        public Rhythms.RhythmState SelectedState { get => _selectedState?.State; }
 
         #endregion
 
@@ -100,6 +103,7 @@ namespace Rhythms_Editor
         {
             Vector2 size = DefineWidthHeightOfTimeline();
 
+            //We differentiate between Full and View. Full is the entire object, View is the portion visible by the scroll rect
             Rect_TimelinesEditorFull = new Rect(Vector2.zero, new Vector2(size.x, size.y * ActiveSequence.Tracks.Count));
             Rect_TimelinesEditorView = new Rect(Vector2.zero, new Vector2(Rect_TimelinesEditorFull.width, position.height));
             Rect_TimelinesEditorView.y = EditorGUIUtility.singleLineHeight;
@@ -108,7 +112,7 @@ namespace Rhythms_Editor
             {
                 if (ActiveSequence.Tracks[i] == null)
                 {
-                    Debug.LogWarning("Corrupt sequence, destroying tracks :(");
+                    Debug.LogWarning("Corrupt sequence, destroying tracks :("); //Temporary null catch, this will only be called if serialization is failing
                     ActiveSequence.Tracks.Clear();
                     Timelines.Clear();
 
@@ -340,7 +344,7 @@ namespace Rhythms_Editor
             int trackIndex = ActiveSequence.Tracks.IndexOf((Rhythms.RhythmTrack)track);
             if (trackIndex < 0)
             {
-                Debug.LogError("Found a track that is not present in the Created Tracks. Clearing all corrupted data.");
+                Debug.LogWarning("Found a track that is not present in the Created Tracks. Clearing all corrupted data."); //Temporary null catch, this will only be called if serialization is failing
                 ActiveSequence.Tracks.Clear();
                 Timelines.Clear();
             }
@@ -406,7 +410,7 @@ namespace Rhythms_Editor
                     break;
 
                 case EventType.MouseUp:
-                    if (hotControl == controlID)
+                    //if (hotControl == controlID)
                     {
                         if (_inputStateActive)
                         {
@@ -451,6 +455,8 @@ namespace Rhythms_Editor
                             _owningTimelineOfInput.MoveStateTo(_selectedState.State, _selectedState.Beat);
 
                             _lastMousePos = e.mousePosition;
+
+                            _refresh = true;
                         }
                     }
                     break;
@@ -467,7 +473,7 @@ namespace Rhythms_Editor
 
         public void SaveSequence()
         {
-            if (_controller) //Meaning we opened this from a controller
+            if (_controller) //Meaning we opened this from a controller (only this is supported at this time, in the future I also want to add scriptable object support from the assets folder)
             {
                 _controller.ActiveSequence = ActiveSequence;
                 EditorUtility.SetDirty(_controller);

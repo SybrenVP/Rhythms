@@ -12,7 +12,7 @@ namespace Rhythms
     [System.Serializable]
     public class SequenceStringContainer : SequenceVariableContainer
     {
-        public new List<R_StringSO> Values = new List<R_StringSO>();
+        public List<R_StringSO> Values = new List<R_StringSO>();
 
         public override int Count() => Values.Count;
 

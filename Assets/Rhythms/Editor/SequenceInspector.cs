@@ -22,7 +22,6 @@ namespace Rhythms_Editor
         private RhythmSequenceEditor _editor;
 
         private int _selectedVariableTypeId = 0;
-        private int _variableNewName = 0;
 
         private GUIStyle _variableNameStyle;
 
@@ -230,7 +229,7 @@ namespace Rhythms_Editor
             {
                 if (var == null)
                 {
-                    Toolbar.SetErrorMessage("Found a null variable, clearing all", 10f);
+                    Debug.Log("Found a null variable, clearing all"); //Temporary null catch, this will only be called if serialization is failing
                     Sequence.Variables.Clear();
                     break;
                 }
@@ -252,7 +251,7 @@ namespace Rhythms_Editor
                 {
                     if (var.ChangingName && Sequence.Variables.DoesNameExist(var.Type, var.TempName, var))
                     {
-                        Toolbar.SetErrorMessage("Name already exists", 5f);
+                        Debug.Log("Name already exists");
                     }
                     else
                     {

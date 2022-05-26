@@ -101,7 +101,7 @@ namespace Rhythms_Editor
             {
                 if (state.Value == null)
                 {
-                    Toolbar.SetErrorMessage("Corrupt sequence, destroying states for Track " + _editor.Timelines.IndexOf(this) + " :(", 2f);
+                    Debug.LogWarning("Corrupt sequence, destroying states for Track " + _editor.Timelines.IndexOf(this) + " :("); //Temporary null catch, this will only be called if serialization is failing
                     Track.States.Clear();
                     _stateDrawers.Clear();
                     return;
@@ -261,7 +261,7 @@ namespace Rhythms_Editor
             int beatNumber = GetBeatForPosition(mousePos);
             if (Track.States.ContainsKey(beatNumber))
             {
-                Toolbar.SetErrorMessage("There's already a state on this beat", 2f);
+                Debug.Log("There's already a state on this beat");
                 return;
             }
 
@@ -307,7 +307,7 @@ namespace Rhythms_Editor
             {
                 if (Track.States[newBeatPos] != state)
                 {
-                    Debug.LogWarning("Unable to move here");
+                    Debug.Log("Unable to move here");
                     return false;
                 }
                 else
