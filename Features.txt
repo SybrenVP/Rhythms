@@ -1,19 +1,49 @@
-RHYTHM editor
-------------
-1. Functionality: 
-	- A plug and play rhythm handler which can help create simple rhythm games //
-	- Beat-actions: 
-		1. BeatLerp //
-		2. *Do* on beat //
-	- Create Rhythm sequences, by recording from editor //
-	- Sequence-actions:
-		1. Instantiate on sequence event//
-		2. Destroy on sequence event//
-	- Sequence editor; Edit your recorded sequences with a visual editor //
+Priority list Rhythms
+---------------------
 
-2. After feedback
-	- Add multi-edit + mass place
-	- Add the possibility to add more event types (preferably an editable enum) + Define a horizontal line per eventType
-	- Visualize the beats as presets, 1 Thick line, 2 3 4 smaller line and number the thick lines	
-	- Add scroll bar to scroll through song, and make the song start from the beginning of the visualized part, This means that the scroll wheel can be used to zoom in on certain parts
-	- Add settings (Toggle waveform, Colors for the whole editor)
+1. Resize states
+	? What does this mean
+	In this position on the roadmap we want to have decent state control
+	We want to get rid of the stupid state menu
+	We need a proper state toolbar
+	a. Length of the state
+	b. Moving the state around
+	c. Selecting and moving multiple states
+	
+
+2. State categories
+	Mainly a visual
+	Implement as a tag system (custom overrides in StateDrawer, basic overrides in settings)
+	a. Pre-State
+	b. Input State
+		This is a state that will listen to input
+	c. Event State
+	d. Base State
+		These are tags, we should be able to add other tags in the Settings
+		These have different stateDrawer, just to differentiate them 
+		We should be able to easily expand and add tags with custom drawers as we go
+
+3. Custom editor for StateActions
+	We should have access to state action editor which allows us to override the look of a state action
+
+4. RhythmComponent with RhythmPatterns
+	Instead of only having a rhtyhm component with every beat a tick, we should be able to assign a pattern on when the event is broadcasted.
+	Basically have a visual indicator like this: [-][-][-][-]|[-][-][-][-] and when we fill it in it could look like this: [-][x][x][-]|[x][-][-][x],
+	Everytime a beat is hit with a 'x' we broadcast the event
+
+5. Templates
+	Same as playmaker, being able to save away entire rhythm sequences, assign them to components, have a list of variables exposed in the prefab editor. When editing them all of the prefabs have the updated sequence
+
+6. GroupedStates 
+	Basically a prefab of states that you can save and place wherever you want. Basically a minor version of the template functionality
+	Instead of allowing it be a sequence, it's a group of states which you can place and edit on its own
+
+7. Run & Debug functionality
+	a. Error display
+	b. Breakpoints
+
+8. UI/UX improvements
+
+9. Expand library of actions 
+	a. Track control (being able to enable/disable tracks)
+
