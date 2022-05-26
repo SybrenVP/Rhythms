@@ -29,48 +29,6 @@ namespace UnityEditor {
 			}
 			);
 		}
-
-		public static void PlayClip(AudioClip clip , int startSample) {
-			Assembly unityEditorAssembly = typeof(AudioImporter).Assembly;
-			Type audioUtilClass = unityEditorAssembly.GetType("UnityEditor.AudioUtil");
-			MethodInfo method = audioUtilClass.GetMethod(
-				"PlayClip",
-				BindingFlags.Static | BindingFlags.Public,
-				null,
-				new System.Type[] {
-				typeof(AudioClip),
-				typeof(Int32)
-			},
-			null
-			);
-			method.Invoke(
-				null,
-				new object[] {
-				clip,
-				startSample
-			}
-			);
-		}
-
-		public static void PlayClip(AudioClip clip) {
-			Assembly unityEditorAssembly = typeof(AudioImporter).Assembly;
-			Type audioUtilClass = unityEditorAssembly.GetType("UnityEditor.AudioUtil");
-			MethodInfo method = audioUtilClass.GetMethod(
-				"PlayClip",
-				BindingFlags.Static | BindingFlags.Public,
-				null,
-				new System.Type[] {
-				typeof(AudioClip)
-			},
-			null
-			);
-			method.Invoke(
-				null,
-				new object[] {
-				clip
-			}
-			);
-		}
 		
 		public static void StopClip(AudioClip clip) {
 			Assembly unityEditorAssembly = typeof(AudioImporter).Assembly;

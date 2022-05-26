@@ -1,283 +1,548 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
+﻿////NEW SEQUENCE EDITOR
 
-public class SequenceEditor : EditorWindow
-{
-    private static Sequence _active = null;
-    private static Texture2D _line = null;
-    private static Texture2D _tex = null;
+//using System.Collections.Generic;
+//using UnityEngine;
+//using UnityEditor;
+//using System.Linq;
 
-    private float _widthPerBeat = 0f;
-    private float _songLength = 0f;
+//public enum SequenceEditorState
+//{
+//    Default,
+//    Playing,
+//    MovingEvents,
+//    Selecting
+//}
 
-    private int _movingEvent = -1;
+//public class SequenceEditor : EditorWindow
+//{
+//    #region Editors
 
-    private bool _foldOutOpen = true;
+//    public EventInspector Inspector = null;
+//    public TimelineViewer TimelineViewer = null;
+//    public EventDrawer EventDrawer = null;
 
-    private const float _buttonSize = 30f;
-    private const int _amtButtons = 5;
-    private const float _sideOffset = 5f;
+//    public LoadedSequenceInformation Info = null;
 
-    private bool _isPlaying = false;
-    private float _startTime = 0f;
-    private float _progress = 0f;
-    private float _widthPerSec = 0f;
+//    #endregion
 
-    private bool _recording = false;
+//    #region Sequence information
 
-    private Rect lastWindowSize;
+//    public Sequence LoadedSequence = null;
 
-    private Texture2D _addButtonTex = null;
-    private Texture2D _playButtonTex = null;
-    private Texture2D _pauseButtonTex = null;
-    private Texture2D _recordButtonTex = null;
-    private Texture2D _settingsButtonTex = null;
+//    protected List<SequenceEvent_Object> _selectedEvents = new List<SequenceEvent_Object>();
 
-    [MenuItem("Window/SequenceEditor")]
-    public static void OpenWindow()
-    {
-        SequenceEditor window = FindObjectOfType<SequenceEditor>();
-        if (window != null)
-            DestroyImmediate(window);
+//    protected float _progress = 0f;
+//    protected float _startedPlayingTime = 0f;
 
-        window = CreateInstance<SequenceEditor>();
-        window.minSize = new Vector2(1000f, 250f);
-        window.Show();
+//    #endregion
 
-        window.RedrawImage();
-    }
+//    #region Timeline information
 
-    public void OnFocus()
-    {
-        lastWindowSize = position;
+//    protected SequenceEditorState _currentState = SequenceEditorState.Default;
 
-        RedrawImage();
-    }
+//    protected float _progressBeforePlaying = 0f;
+//    protected bool _changedPlayingToCurrent = false;
 
-    private void Update()
-    {
-        if (_isPlaying && !EditorApplication.isPlaying)
-        {
-            _progress = Time.realtimeSinceStartup - _startTime;
-            Repaint();
-        }
-        else if(EditorApplication.isPlaying)
-        {
-            //Fetch the rhythmcontroller
-            var rhythmController = FindObjectOfType<RhythmController>();
-            //get the loaded sequence
-            if (rhythmController.LoadedSequence != null && rhythmController.LoadedSequence != _active)
-            {
-                _active = rhythmController.LoadedSequence;
-                _isPlaying = false;
-                _progress = 0f;
-                RedrawImage();
-            }
-            else if(rhythmController.MusicSource.isPlaying)
-            {
-                _progress = rhythmController.SongPosition;
-                _isPlaying = true;
-                Repaint();
-            }
+//    #endregion
 
-        }
-    }
+//    #region Inspector information
 
-    private void OnGUI()
-    {
-        if (_active == null)
-            return;
+//    protected bool _openInspector = false;
 
-        #region Input
+//    protected Rect _inspectorRect = new Rect();
 
-        var e = Event.current;
+//    #region Folderstructure
 
-        switch(e.type)
-        {
-            case EventType.MouseUp:
-                _movingEvent = -1;
-                _active.ReorderEvents();
-                break;
-            case EventType.MouseDown:
-                if (_movingEvent < 0)
-                {
-                    _progress = (int)e.mousePosition.x / _widthPerSec;
-                    RedrawImage();
-                }
-                break;
-            case EventType.KeyUp:
-                if (_recording && e.keyCode == KeyCode.Space)
-                    _active.AddEvent(Mathf.Round(((_progress * _widthPerSec) / _widthPerBeat) * 2 / 1) * 1 / 2);
-                if (_movingEvent >= 0 && e.keyCode == KeyCode.D)
-                {
-                    _active.EventPositions.RemoveAt(_movingEvent);
-                    _movingEvent = -1;
-                }
-                if (e.keyCode == KeyCode.P)
-                    StartClip();
-                if (e.keyCode == KeyCode.K)
-                {
-                    AudioUtility.StopAllClips();
-                    _isPlaying = false;
-                }
-                break;
-        }
+//    protected Dictionary<SequenceEvent, string> _allCallEvents = null;
+//    protected Dictionary<string, bool> _folderFoldout = new Dictionary<string, bool>();
+//    protected Vector2 _folderScrollPos = Vector2.zero;
 
-        if (_movingEvent >= 0)
-        {
-            _active.EventPositions[_movingEvent] = Mathf.Round((e.mousePosition.x / _widthPerBeat) * 2 / 1) * 1 / 2;
+//    #endregion
 
-            Repaint();
-        }
+//    #endregion
 
-        if (position != lastWindowSize)
-        {
-            lastWindowSize = position;
-            RedrawImage();
-        }
+//    #region Rects
 
-        #endregion
+//    Rect _progressRect = new Rect();
+//    Rect _progressBeatRect = new Rect();
 
-        #region Waveform tex
+//    Rect _scrollViewableRect = new Rect();
 
-        GUI.DrawTexture(new Rect(0, position.size.y - _tex.height, position.size.x, position.size.y), _tex);
+//    Rect _selectionRect = new Rect();
 
-        #endregion
+//    #endregion
 
-        #region Sequence events
+//    #region Editor information
 
-        for (int i = 0; i < _active.EventPositions.Count; i++)
-        {
-            Rect buttonRect = new Rect(_widthPerBeat * _active.EventPositions[i] + _active.SongOffset, position.size.y - _tex.height, 1f, position.size.y);
-            GUI.DrawTexture(buttonRect, _line);
+//    protected Rect _lastWindowSize;
 
-            if(e.type == EventType.MouseDown)
-            {
-                Rect inputRect = new Rect(buttonRect.position - new Vector2(1f, 0f), buttonRect.size + new Vector2(2f, 0f));
-                if (inputRect.Contains(e.mousePosition))
-                {
-                    _movingEvent = i;
-                    Debug.Log("Moving event: " + i);
-                }
-            }
-        }
+//    protected Vector2 _scrollPosition = Vector2.zero;
 
-        #endregion
+//    #endregion
 
-        #region Visual progress while playing
+//    [MenuItem("Window/SequenceEditor")]
+//    public static void OpenWindow()
+//    {
+//        SequenceEditor window = FindObjectOfType<SequenceEditor>();
+//        if (window != null)
+//            DestroyImmediate(window);
 
-        EditorGUI.DrawRect(new Rect(0f, position.size.y - _tex.height, _progress * _widthPerSec, _tex.height), new Color(0.7f, 0.7f, 0.7f, 0.5f));
+//        window = CreateInstance<SequenceEditor>();
 
-        if (_isPlaying)
-        {
-            //EditorGUI.DrawRect(new Rect(0f, position.size.y - _tex.height, _progress * _widthPerSec, _tex.height), new Color(0.7f, 0.7f, 0.7f, 0.5f));
-            if (_progress >= _active.Song.length)
-            {
-                _isPlaying = false;
-                _recording = false;
-            }
-        }
+//        window.Initiate();
 
-        #endregion
+//        window.Show();
 
-        #region Editor buttons
+//        window.Info = new LoadedSequenceInformation();
+//        window.Info.WidthPerSec = 50f;
 
-        EditorGUI.DrawRect(new Rect(0f, position.size.y - (_foldOutOpen ? (_sideOffset * 2f + _buttonSize) : 0f), _amtButtons * _buttonSize + _sideOffset * 2f, _sideOffset * 2f + _buttonSize), new Color(0.5f, 0.5f, 0.5f, 1f));
+//        window.OpenSequence(Selection.activeObject as Sequence);
 
-        if (GUI.Button(new Rect(_sideOffset * 2f + (_amtButtons - 1) * _buttonSize, position.size.y - (_foldOutOpen ? (_sideOffset * 2f + _buttonSize) : 0f) - _buttonSize / 2f, _buttonSize, _buttonSize / 2f), "^"))
-        {
-            _foldOutOpen = !_foldOutOpen;
-            _movingEvent = -1;
-            return;
-        }
+//        window.RefreshEvents();
+//    }
 
-        if (_foldOutOpen && GUI.Button(new Rect(_sideOffset, position.size.y - _buttonSize - _sideOffset, _buttonSize, _buttonSize), new GUIContent(_addButtonTex)))
-        {
-            _active.EventPositions.Add(_active.EventPositions[_active.EventPositions.Count - 1] + 1);
-            return;
-        }
+//    protected void Initiate()
+//    {
+//        TimelineViewer = new TimelineViewer();
 
-        if (_foldOutOpen && GUI.Button(new Rect(_sideOffset + _buttonSize, position.size.y - _buttonSize - _sideOffset, _buttonSize, _buttonSize), new GUIContent(_playButtonTex)))
-        {
-            StartClip();
-            return;
-        }
+//    }
 
-        if (_foldOutOpen && GUI.Button(new Rect(_sideOffset + _buttonSize * 2, position.size.y - _buttonSize - _sideOffset, _buttonSize, _buttonSize), new GUIContent(_pauseButtonTex)))
-        {
-            AudioUtility.StopAllClips();
-            _isPlaying = false;
-            _recording = false;
-            return;
-        }
+//    public void OnFocus()
+//    {
+//        RefreshEvents();
+//    }
 
-        if(_foldOutOpen && GUI.Button(new Rect(_sideOffset + _buttonSize * 3, position.size.y - _buttonSize - _sideOffset, _buttonSize, _buttonSize), new GUIContent(_recordButtonTex)))
-        {
-            _recording = true;
-            StartClip();
-            return;
-        }
+//    protected void Update()
+//    {
+//        if (LoadedSequence == null)
+//            return;
 
-        if (_foldOutOpen && GUI.Button(new Rect(_sideOffset + _buttonSize * 4, position.size.y - _buttonSize - _sideOffset, _buttonSize, _buttonSize), new GUIContent(_settingsButtonTex)))
-        {
-            return;
-        }
+//        #region Progress
 
-        #endregion
-    }
+//        if (_currentState == SequenceEditorState.Playing && !EditorApplication.isPlaying)
+//        {
+//            _progress = AudioUtility.GetClipPosition(LoadedSequence.Song);
+            
+//            Repaint();
+//        }
+//        else if (EditorApplication.isPlaying)
+//        {
+//            //Update progress during playtime here
+//            RhythmController rhythm = FindObjectOfType<RhythmController>();
+//            if (rhythm.LoadedSequence != null && rhythm.LoadedSequence != LoadedSequence)
+//            {
+//                OpenSequence(rhythm.LoadedSequence);
+//            }
 
-    private void OnSelectionChange()
-    {
-        RedrawImage();
-    }
+//            if (rhythm.MusicSource.isPlaying)
+//            {
+//                _progress = rhythm.SongPosition;
+//                Repaint();
+//            }
+//        }
 
-    public void ChangeSelection()
-    {
-        if (Selection.activeObject is Sequence)
-        {
-            _active = Selection.activeObject as Sequence;
-        }
-    }
+//        #endregion
 
-    private void RedrawImage()
-    {
-        ChangeSelection();
-        if (_active)
-        {
-            _tex = SequenceUtilities.GetWaveformTextureFromAudioClip(_active.Song, 1f, (int)position.size.x, (int)position.size.y, Color.white);
-            _line = SequenceUtilities.GetTexture(1, (int)position.size.y, Color.cyan);
+//        #region Selection
 
+//        if (_currentState == SequenceEditorState.Selecting)
+//            Repaint();
 
-            //Define song length and width/beat
-            _songLength = _active.Song.length;
-            _widthPerSec = _tex.width / _songLength;
-            float BeatPerSec = _active.Bpm / 60f;
+//        #endregion
 
-            _widthPerBeat = _widthPerSec / BeatPerSec;
+//        if (_lastWindowSize != position)
+//            OpenSequence(LoadedSequence);
+//    }
 
-            _addButtonTex = Resources.Load("add") as Texture2D;
-            _playButtonTex = Resources.Load("play") as Texture2D;
-            _pauseButtonTex = Resources.Load("pause") as Texture2D;
-            _recordButtonTex = Resources.Load("record") as Texture2D;
-            _settingsButtonTex = Resources.Load("settings") as Texture2D;
-        }
+//    protected void OnGUI()
+//    {
+//        if (LoadedSequence == null)
+//            return;
 
-        Repaint();
-    }
+//        #region Input
 
-    private void StartClip()
-    {
-        //Calculate the startSample
-        int startSample = 0;
-        float percentage = _progress / _active.Song.length;
-        int amtSamples = _active.Song.samples * _active.Song.channels;
-        startSample = (int)(percentage * amtSamples);
+//        var e = Event.current;
 
-        AudioUtility.PlayClip(_active.Song, 0, false);
-        AudioUtility.SetClipSamplePosition(_active.Song, startSample);
-        _startTime = Time.realtimeSinceStartup - _progress;
-        _isPlaying = true;
-    }
-}
+//        switch (e.type)
+//        {
+//            case EventType.MouseDown:
+//                if (e.button == 0)
+//                {
+//                    if (_currentState == SequenceEditorState.Default)
+//                    {
+//                        if (_scrollViewableRect.Contains(e.mousePosition))
+//                        {
+//                            _currentState = SequenceEditorState.Selecting;
+//                            _selectionRect.size = Vector2.zero;
+//                            _selectionRect.position = e.mousePosition;
+//                        }
+
+//                        foreach (SequenceEvent_Object seqEv in LoadedSequence.Events)
+//                        {
+//                            Rect properSeqEVRect = new Rect(seqEv.Editor_Rect);
+//                            properSeqEVRect.x -= _scrollPosition.x;
+//                            if (properSeqEVRect.Contains(e.mousePosition) && _selectedEvents.Contains(seqEv))
+//                            {
+//                                _currentState = SequenceEditorState.MovingEvents;
+//                                break;
+//                            }
+//                            else if(properSeqEVRect.Contains(e.mousePosition))
+//                            {
+//                                StartDrag(seqEv);
+//                                break;
+//                            }
+//                        }
+//                    }
+//                }
+//                break;
+//            case EventType.MouseUp:
+//                if (_currentState == SequenceEditorState.MovingEvents && _selectedEvents.Count > 0)
+//                {
+//                    foreach (SequenceEvent_Object seqEv in _selectedEvents)
+//                    {
+//                        Vector2 timelinePos = TranslateToTimelinePos(seqEv.Editor_Rect);
+//                        seqEv.BeatPos = timelinePos.x;
+//                        seqEv.PlacedOnLine = (int)timelinePos.y;
+//                        seqEv.Editor_Rect.x = Info.WidthPerBeat * seqEv.BeatPos + LoadedSequence.SongOffset * Info.WidthPerSec + TimelineViewer.Offset;
+//                        seqEv.Editor_Rect.y = TimelineViewer.HEIGHT_PER_ROW * seqEv.PlacedOnLine + TimelineViewer.HEIGHT_PER_ROW / 4f;
+//                    }
+
+//                    _currentState = SequenceEditorState.Default;
+//                    Repaint();
+//                }
+//                else if (_currentState == SequenceEditorState.Selecting)
+//                {
+//                    _selectedEvents.Clear();
+//                    foreach (var ev in LoadedSequence.Events)
+//                    {
+//                        Vector2 rectCenter = ev.Editor_Rect.center;
+//                        rectCenter.x -= _scrollPosition.x;
+//                        if (_selectionRect.Contains(rectCenter))
+//                            _selectedEvents.Add(ev);
+//                    }
+//                    _currentState = SequenceEditorState.Default;
+//                    Repaint();
+//                }
+//                break;
+//            case EventType.MouseDrag:
+//                if (e.button == 0)
+//                {
+//                    if (_currentState == SequenceEditorState.MovingEvents)
+//                    {
+//                        foreach (SequenceEvent_Object seqEv in _selectedEvents)
+//                        {
+//                            seqEv.Editor_Rect.position += e.delta;
+//                        }
+//                        Repaint();
+//                    }
+//                    else if(_currentState == SequenceEditorState.Selecting)
+//                    {
+//                        _selectionRect.width = e.mousePosition.x - _selectionRect.position.x;
+//                        _selectionRect.height = e.mousePosition.y - _selectionRect.position.y;
+//                    }
+//                }
+//                else if(e.button == 2)
+//                {
+//                    _scrollPosition -= e.delta;
+//                    Repaint();
+//                }
+//                break;
+//            case EventType.ScrollWheel:
+//                if (TimelineViewer.TimelineRect.Contains(e.mousePosition))
+//                {
+//                    Info.WidthPerSec -= e.delta.y;
+//                    if (Info.WidthPerSec * LoadedSequence.Song.length < position.width)
+//                        Info.WidthPerSec = position.width / LoadedSequence.Song.length;
+//                    Info.WidthPerBeat = Info.WidthPerSec / (LoadedSequence.Bpm / 60f);
+
+//                    //Update the rect of the events
+//                    EventDrawer.UpdateEventPositions();
+//                    Repaint();
+//                }
+//                break;
+//            case EventType.KeyUp:
+//                switch (e.keyCode)
+//                {
+//                    case KeyCode.D:
+//                        foreach (SequenceEvent_Object seqEv in _selectedEvents)
+//                        {
+//                            List<SequenceEvent_Object> otherEv = new List<SequenceEvent_Object>();
+
+//                            if (seqEv.BaseEvent.Type == SequenceEventType.Response)
+//                            {
+//                                SequenceEvent_Object temp = LoadedSequence.Events.Find(callEv => callEv.Response.Contains(seqEv));
+//                                if (temp != null)
+//                                {
+//                                    otherEv.Add(temp);
+//                                    otherEv.AddRange(temp.Response);
+//                                }
+
+//                            }
+//                            else
+//                            {
+//                                otherEv.AddRange(seqEv.Response);
+//                                otherEv.Add(seqEv);
+//                            }
+
+//                            if (otherEv.Count > 0)
+//                                LoadedSequence.Events.RemoveAll(ev => otherEv.Contains(ev));
+//                        }
+//                        Repaint();
+//                        break;
+//                }
+//                break;
+//        }
+
+//        #endregion
+
+//        #region Timeline
+        
+//        _scrollPosition = GUI.BeginScrollView(TimelineViewer.TimelineRect, _scrollPosition, _scrollViewableRect, true, false);
+
+//        if (_currentState == SequenceEditorState.Playing)
+//            _scrollPosition.x = _progress * Info.WidthPerSec;
+//        else if (_changedPlayingToCurrent)
+//        {
+//            _changedPlayingToCurrent = false;
+//            _scrollPosition.x = _progress * Info.WidthPerSec;
+//        }
+//        else
+//            _progress = _scrollPosition.x / Info.WidthPerSec;
+
+//        TimelineViewer.DrawWithinScroll(_scrollViewableRect);
+
+//        EventDrawer.DrawWithinScroll(_scrollViewableRect);
+
+//        _progressRect = new Rect(_progress * Info.WidthPerSec + LoadedSequence.SongOffset * Info.WidthPerSec - 2f + TimelineViewer.Offset, 0f, 5f, position.height - Inspector.Height);
+//        _progressBeatRect = new Rect(_progress * Info.WidthPerSec + LoadedSequence.SongOffset * Info.WidthPerSec + 10f + TimelineViewer.Offset, 10f, 50f, 50f);
+
+//        EditorGUI.DrawRect(_progressRect, Color.cyan);
+//        EditorGUI.LabelField(_progressBeatRect, (_progress * (LoadedSequence.Bpm / 60f)).ToString("F1"), EditorStyles.boldLabel);
+
+//        GUI.EndScrollView(false);
+
+//        TimelineViewer.DrawGUI();
+
+//        if(_currentState == SequenceEditorState.Selecting)
+//            EditorGUI.DrawRect(_selectionRect, new Color(0.9f, 0.9f, 0.9f, 0.2f));
+
+//        #endregion
+
+//        #region Bottom placed inspector
+    
+//        if(_openInspector)
+//        {
+//            GUILayout.BeginArea(new Rect(0f, position.size.y - Inspector.Height, position.width / 3f, Inspector.Height));
+//            _folderScrollPos = GUILayout.BeginScrollView(_folderScrollPos, false, true);
+
+//            //Based on in which folder we found the events, we create our very own folder structure on the left
+//            string prevValue = "";
+//            foreach(KeyValuePair<SequenceEvent, string> kvp in _allCallEvents)
+//            {
+//                if(prevValue != kvp.Value)
+//                {
+//                    if (!_folderFoldout.ContainsKey(kvp.Value))
+//                        _folderFoldout.Add(kvp.Value, false);
+
+//                    if(EditorGUI.indentLevel > 0)
+//                        EditorGUI.indentLevel -= 2;
+//                    _folderFoldout[kvp.Value] = EditorGUILayout.Foldout(_folderFoldout[kvp.Value], kvp.Value, EditorStyles.foldoutHeader);
+//                    prevValue = kvp.Value;
+//                    EditorGUI.indentLevel += 2;
+//                }
+
+//                if (_folderFoldout[kvp.Value])
+//                {
+//                    EditorGUILayout.LabelField(kvp.Key.name);
+                    
+//                    if (e.type == EventType.MouseDown && GUILayoutUtility.GetLastRect().Contains(e.mousePosition))
+//                        CreateAndDragEvent(kvp.Key);
+//                }
+//            }
+
+//            GUILayout.EndScrollView();
+
+//            //From there you can select and drag an event / mini-game
+
+//            GUILayout.EndArea();
+
+//            GUILayout.BeginArea(new Rect(position.width / 3f, position.size.y - Inspector.Height, 2 * position.width / 3f, Inspector.Height));
+
+//            //On the right you will see the general information of the selected sequence
+//            EditorGUILayout.LabelField("Progress in seconds: " + _progress.ToString("F1"));
+//            EditorGUILayout.LabelField("Progress in beats: " + (_progress * (LoadedSequence.Bpm / 60f)).ToString("F1"));
+
+//            GUILayout.EndArea();
+//        }
+
+//        #endregion
+//    }
+
+//    protected void OnSelectionChange()
+//    {
+//        if (Selection.activeObject is Sequence)
+//            OpenSequence(Selection.activeObject as Sequence);
+//    }
+
+//    public void OpenSequence(Sequence seq)
+//    {
+//        TimelineViewer = new TimelineViewer();
+//        TimelineViewer.Init(this);
+
+//        EventDrawer = new EventDrawer();
+//        EventDrawer.Init(this);
+
+//        Inspector = new EventInspector();
+//        Inspector.Init(this);
+
+//        LoadedSequence = seq;
+
+//        _currentState = SequenceEditorState.Default;
+
+//        if (Info == null)
+//            Info = new LoadedSequenceInformation();
+//        Info.Init(LoadedSequence);
+
+//        _lastWindowSize = position;
+
+//        #region Init rects
+
+//        TimelineViewer.TimelineRect = new Rect(0f, 0f, position.width, position.height - Inspector.Height);
+//        _inspectorRect = new Rect(0f, position.height - Inspector.Height, position.width, Inspector.Height);
+
+//        _scrollViewableRect = new Rect(Vector2.zero, new Vector2(Info.WidthPerSec * LoadedSequence.Song.length + TimelineViewer.Offset, position.size.y - Inspector.Height - 50f));
+
+//        #endregion
+
+//        Repaint();
+//    }
+
+//    #region Timeline
+
+//    protected void DrawEvent(SequenceEvent_Object seqEv)
+//    {
+//        Handles.BeginGUI();
+//        if (_selectedEvents.Contains(seqEv))
+//            Handles.DrawSolidRectangleWithOutline(seqEv.Editor_Rect, Color.white, Color.black);
+//        else
+//            Handles.DrawSolidRectangleWithOutline(seqEv.Editor_Rect, Color.gray, Color.black);
+        
+//        Handles.EndGUI();
+
+//        GUILayout.BeginArea(seqEv.Editor_Rect);
+
+//        GUI.contentColor = Color.black;
+//        GUILayout.Label(seqEv.BeatPos.ToString());
+//        GUILayout.Label(seqEv.BaseEvent.Type.ToString());
+//        GUILayout.Label(seqEv.BaseEvent.name.Substring(seqEv.BaseEvent.Type == SequenceEventType.Call ? 5 : 3));
+//        GUI.contentColor = Color.white;
+
+//        GUILayout.EndArea();
+//    }
+
+//    protected void DrawConnection(SequenceEvent_Object seqEv)
+//    {   
+//        Handles.BeginGUI();
+        
+//        foreach(SequenceEvent_Object responseEv in seqEv.Response)
+//            Handles.DrawLine(seqEv.Editor_Rect.center, responseEv.Editor_Rect.center);
+    
+//        Handles.EndGUI();
+//    }
+
+//    protected Vector2 TranslateToTimelinePos(Rect editorPos)
+//    {
+//        Vector2 result = new Vector2();
+
+//        result.x = (int)((editorPos.x - TimelineViewer.Offset) / Info.WidthPerBeat);
+//        result.x = Mathf.Clamp(result.x, 0f, Info.AmtBeatsInSong);
+//        result.y = (int)(editorPos.center.y / TimelineViewer.HEIGHT_PER_ROW);
+//        result.y = Mathf.Clamp(result.y, 0, 3);
+
+//        return result;
+//    }
+
+//    #endregion
+
+//    #region Timeline controls
+
+//    public void StartPlaying()
+//    {
+//        AudioUtility.StopAllClips();
+
+//        //Calculate the startSample
+//        int startSample = 0;
+//        float percentage = _progress / LoadedSequence.Song.length;
+//        int amtSamples = LoadedSequence.Song.samples;
+//        startSample = (int)(percentage * amtSamples);
+
+//        _progressBeforePlaying = _progress;
+
+//        _currentState = SequenceEditorState.Playing;
+//        AudioUtility.PlayClip(LoadedSequence.Song, startSample, false);
+//        AudioUtility.SetClipSamplePosition(LoadedSequence.Song, startSample);
+//    }
+
+//    public void StopPlaying()
+//    {
+//        AudioUtility.StopClip(LoadedSequence.Song);
+//        _currentState = SequenceEditorState.Default;
+//        _progress = _progressBeforePlaying;
+//        _changedPlayingToCurrent = true;
+//    }
+
+//    #endregion
+
+//    #region Inspector controls
+
+//    protected void CreateAndDragEvent(SequenceEvent value)
+//    {
+//        _selectedEvents.Clear();
+
+//        SequenceEvent_Object newEvent = new SequenceEvent_Object(value);
+
+//        newEvent.Editor_Rect = new Rect(Event.current.mousePosition.x, position.height - Inspector.Height + Event.current.mousePosition.y, Info.WidthPerBeat * value.LengthInBeats, TimelineViewer.HEIGHT_PER_ROW / 2f);
+
+//        _selectedEvents.Add(newEvent);
+//        LoadedSequence.Events.Add(newEvent);
+
+//        if(newEvent.BaseEvent.ResponseEvent != null && newEvent.BaseEvent.ResponseEvent.Count > 0)
+//        {
+//            for(int i = 0; i < newEvent.BaseEvent.ResponseEvent.Count; i++) 
+//            {
+//                SequenceEvent_Object responseEvent = new SequenceEvent_Object(newEvent.BaseEvent.ResponseEvent[i]);
+
+//                responseEvent.Editor_Rect = new Rect(Event.current.mousePosition.x + newEvent.Editor_Rect.width, position.height - Inspector.Height + Event.current.mousePosition.y, Info.WidthPerBeat * responseEvent.BaseEvent.LengthInBeats, TimelineViewer.HEIGHT_PER_ROW / 2f);
+//                if(i > 0)
+//                    responseEvent.Editor_Rect.x = newEvent.Response[i - 1].Editor_Rect.x + newEvent.Response[i - 1].Editor_Rect.width;
+
+//                newEvent.Response.Add(responseEvent);
+
+//                _selectedEvents.Add(responseEvent);
+//                LoadedSequence.Events.Add(responseEvent);
+//            }
+//        }
+
+//        _currentState = SequenceEditorState.MovingEvents;
+
+//        Repaint();
+//    }
+
+//    protected void StartDrag(SequenceEvent_Object seqEv)
+//    {
+//        _selectedEvents.Add(seqEv);
+//        _currentState = SequenceEditorState.MovingEvents;
+//    }
+
+//    #endregion
+
+//    #region Helpers
+
+//    protected void RefreshEvents()
+//    {
+//        _folderFoldout.Clear();
+//        _allCallEvents = SequenceUtilities.LoadAllSequenceEvents();
+//    }
+
+//    #endregion
+//}

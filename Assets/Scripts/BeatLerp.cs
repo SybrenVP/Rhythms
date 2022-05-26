@@ -15,25 +15,29 @@ public static class BeatLerp
     /// <returns>The id of the lerp</returns>
     public static int StartLerp(Vector3 startPos, Vector3 endPos, float amtBeatsToReachEnd, Action callback)
     {
-        BeatLerpObject newLerp = new BeatLerpObject(_activeLerps.Count, startPos, endPos, RhythmController.Instance.SongPositionInBeats, amtBeatsToReachEnd, callback);
-        _activeLerps.Add(newLerp);
+        //BeatLerpObject newLerp = new BeatLerpObject(_activeLerps.Count, startPos, endPos, RhythmController.Instance.SongPositionInBeats, amtBeatsToReachEnd, callback);
+        //_activeLerps.Add(newLerp);
+        //
+        //return newLerp.Id;
 
-        return newLerp.Id;
+        return 0;
     }
 
     public static Vector3 LerpProgressFromId(int id)
     {
-        float step = (RhythmController.Instance.SongPositionInBeats - (_activeLerps[id].StartBeat)) / _activeLerps[id].AmtBeatsToReachEnd;
+        //float step = (RhythmController.Instance.SongPositionInBeats - (_activeLerps[id].StartBeat)) / _activeLerps[id].AmtBeatsToReachEnd;
+        //
+        //Vector3 newPos = Vector3.Lerp(_activeLerps[id].StartPos, _activeLerps[id].EndPos, step);
+        //
+        //if(Vector3.SqrMagnitude(newPos - _activeLerps[id].EndPos) <= Mathf.Epsilon)
+        //{
+        //    _activeLerps[id].Callback?.Invoke();
+        //    EndLerpId(id);
+        //}
+        //
+        //return newPos;
 
-        Vector3 newPos = Vector3.Lerp(_activeLerps[id].StartPos, _activeLerps[id].EndPos, step);
-
-        if(Vector3.SqrMagnitude(newPos - _activeLerps[id].EndPos) <= Mathf.Epsilon)
-        {
-            _activeLerps[id].Callback?.Invoke();
-            EndLerpId(id);
-        }
-
-        return newPos;
+        return Vector3.zero;
     }
 
     public static void EndLerpId(int id)

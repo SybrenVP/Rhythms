@@ -1,0 +1,15 @@
+How the call and response system will work in code?
+
+Sequence will send out Call event to any listeners
+	Listeners could range from instantiation to animation triggers or sound effects etc
+
+Upon receiving the call event, a listener could also ensure the response setup completes.
+	EX: Maybe an instantiation needs to happen before the response can be called
+
+A response will almost in all cases be an input event (I can't actually think of any other)
+
+The object will wait for the correct input event, after the event came through it will check if it came in on time. 
+
+If the event doesn't come in before the first beat after the last beat of the response then it will be dismissed. 
+
+Responses with more than 1 beat in length will wait for a start and end. (could be used for performing an input over a set amount of beats)

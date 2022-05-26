@@ -12,8 +12,8 @@ RHYTHM editor
 	- Sequence editor; Edit your recorded sequences with a visual editor //
 
 2. After feedback
-	- Add multi-edit 
+	- Add multi-edit + mass place
 	- Add the possibility to add more event types (preferably an editable enum) + Define a horizontal line per eventType
-	- Visualize the beats as presets, 1 Thick line, 2 3 4 smaller line
+	- Visualize the beats as presets, 1 Thick line, 2 3 4 smaller line and number the thick lines	
 	- Add scroll bar to scroll through song, and make the song start from the beginning of the visualized part, This means that the scroll wheel can be used to zoom in on certain parts
 	- Add settings (Toggle waveform, Colors for the whole editor)
