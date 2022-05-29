@@ -190,18 +190,6 @@ namespace Rhythms_Editor
 
             #endregion
 
-            #region States
-
-            int cachedCount = _stateDrawers.Count;
-            foreach(StateDrawer stateDrawer in _stateDrawers)
-            {
-                stateDrawer.OnGUI();
-                if (_stateDrawers.Count != cachedCount)
-                    break;
-            }
-
-            #endregion
-
             #region Debug
 
             //EditorGUI.DrawRect(_autoScrollLeft, Color.red);
@@ -210,6 +198,32 @@ namespace Rhythms_Editor
             #endregion
 
             HandleInput();
+        }
+
+        public void OnStateGUI()
+        {
+            #region States
+
+            int cachedCount = _stateDrawers.Count;
+            foreach (StateDrawer stateDrawer in _stateDrawers)
+            {
+                stateDrawer.OnGUI();
+                if (_stateDrawers.Count != cachedCount)
+                    break;
+            }
+
+            #endregion
+        }
+
+        public void OnStateGhostGUI()
+        {
+            int cachedCount = _stateDrawers.Count;
+            foreach (StateDrawer stateDrawer in _stateDrawers)
+            {
+                stateDrawer.OnGhostGUI();
+                if (_stateDrawers.Count != cachedCount)
+                    break;
+            }
         }
 
         private void HandleInput()

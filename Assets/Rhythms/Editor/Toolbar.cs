@@ -79,6 +79,8 @@ namespace Rhythms_Editor
                 {
                     DrawStateToolbar();
 
+                    DrawActionStackToolbar();
+
                     DrawTimelineToolbar();
 
                     DrawSoundControl();
@@ -124,6 +126,31 @@ namespace Rhythms_Editor
             GUILayout.Space(BUTTON_HORIZONTAL_OFFSET);
 
             _nextTool = (ToolType)GUILayout.Toolbar((int)_selectedTool, _stateToolbarContent, EditorStyles.toolbarButton, GUILayout.Width(_stateToolbarContent.Length * BUTTON_WIDTH));
+
+            GUILayout.Space(BUTTON_HORIZONTAL_OFFSET);
+        }
+
+        private void DrawActionStackToolbar()
+        {
+            GUILayout.Space(BUTTON_HORIZONTAL_OFFSET);
+
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+            {
+                EditorGUI.BeginDisabledGroup(!_editor.HasUndoChanges());
+                if (GUILayout.Button("Undo", EditorStyles.toolbarButton, GUILayout.Width(BUTTON_WIDTH)))
+                {
+                    _editor.UndoChange();
+                }
+                EditorGUI.EndDisabledGroup();
+
+                EditorGUI.BeginDisabledGroup(!_editor.HasRedoChanges());
+                if (GUILayout.Button("Redo", EditorStyles.toolbarButton, GUILayout.Width(BUTTON_WIDTH)))
+                {
+                    _editor.RedoChange();
+                }
+                EditorGUI.EndDisabledGroup();
+            }
+            EditorGUILayout.EndHorizontal();
 
             GUILayout.Space(BUTTON_HORIZONTAL_OFFSET);
         }

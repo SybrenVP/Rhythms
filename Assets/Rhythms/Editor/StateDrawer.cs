@@ -63,20 +63,23 @@ namespace Rhythms_Editor
             EditorGUI.DrawRect(View, _backgroundColor);
             Utility.DrawShadowRect(View, new Inset(), 5, _shadowColor);
 
-            if (_box_1 != null)
-                _box_1.Draw();
-            if (_box_2 != null)
-                _box_2.Draw();
-
             GUILayout.BeginArea(View);
 
             //GUILayout.Label(State.Actions.Count.ToString());
             GUILayout.Label(State.LengthInBeats.ToString());
 
             GUILayout.EndArea();
+        }
 
+        public void OnGhostGUI()
+        {
             if (_ghost != null)
                 _ghost.OnGUI();
+
+            if (_box_1 != null)
+                _box_1.Draw();
+            if (_box_2 != null)
+                _box_2.Draw();
         }
 
         public void SetBeat(int beat)
@@ -222,6 +225,12 @@ namespace Rhythms_Editor
                     _ghost = null;
             }
         }
+
+        public StateDrawer GetGhost()
+        {
+            return _ghost;
+        }
+
 
         #endregion
     }

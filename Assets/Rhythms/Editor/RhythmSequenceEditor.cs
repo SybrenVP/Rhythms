@@ -45,7 +45,8 @@ namespace Rhythms_Editor
 
         #endregion
         
-        RhythmSequenceEditorInputController _inputController = null;
+        private RhythmSequenceEditorInputController _inputController = null;
+        private EditorActionStack _actionStack = null;
 
         private Rhythms.RhythmController _controller = null;
 
@@ -81,6 +82,8 @@ namespace Rhythms_Editor
             InitializeSequenceInspector();
 
             InitializeInputController();
+
+            InitializeActionStack();
         }
 
         private void InitializeTrackTimelines()
@@ -162,6 +165,11 @@ namespace Rhythms_Editor
             _inputController.Init(Tools, this);
         }
 
+        private void InitializeActionStack()
+        {
+            _actionStack = new EditorActionStack();
+        }
+
         protected void OnEnable()
         {
             var controller = Selection.activeGameObject.GetComponent<Rhythms.RhythmController>();
@@ -234,6 +242,17 @@ namespace Rhythms_Editor
                 timeline.OnGUI();
             }
 
+            //Draw states on the timeline here
+            foreach (TrackTimeline timeline in Timelines)
+            {
+                timeline.OnStateGUI();
+            }
+
+            foreach (TrackTimeline timeline in Timelines)
+            {
+                timeline.OnStateGhostGUI();
+            }
+
             GUI.EndScrollView(true);
 
             #endregion
@@ -284,6 +303,35 @@ namespace Rhythms_Editor
             UpdateTimelines();
         }
 
+
+        #endregion
+
+        #region Undo/Redo
+
+        public void RecordChange(RhythmToolAction action)
+        {
+            _actionStack.Record(action);
+        }
+
+        public void UndoChange()
+        {
+            _actionStack.Undo();
+        }
+
+        public void RedoChange()
+        {
+            _actionStack.Redo();
+        }
+
+        public bool HasUndoChanges()
+        {
+            return _actionStack.HasUndoChanges();
+        }
+
+        public bool HasRedoChanges()
+        {
+            return _actionStack.HasRedoChanges();
+        }
 
         #endregion
 

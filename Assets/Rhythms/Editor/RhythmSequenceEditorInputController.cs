@@ -277,6 +277,8 @@ namespace Rhythms_Editor
 
         private void HandleMouseUpMove(Event e)
         {
+            RecordGhost();
+
             SelectedState.ApplyGhost();
 
             _inputOwningTimeline = null;
@@ -285,6 +287,13 @@ namespace Rhythms_Editor
 
             GUIUtility.hotControl = 0;
             e.Use();
+        }
+
+        private void RecordGhost()
+        {
+            StateDrawer ghost = SelectedState.GetGhost();
+            RhythmToolStateMoveAction newChange = new RhythmToolStateMoveAction(SelectedState, SelectedState.OwningTimeline, ghost.OwningTimeline, SelectedState.Beat, ghost.Beat);
+            _editor.RecordChange(newChange);
         }
 
         private void HandleMouseDragMove(Event e)
