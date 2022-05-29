@@ -14,14 +14,16 @@ public class RhythmBeatDragBox
     private Vector2 _size;
     private Rect _view;
     private UnityAction<int, int> _onBeatChanged;
+    private UnityAction _onBeatApplied;
 
     private bool _dragActive = false;
 
-    public static RhythmBeatDragBox Create(int beat, Rhythms_Editor.TrackTimeline owningTimeline, Vector2 size, UnityAction<int, int> onBeatChanged)
+    public static RhythmBeatDragBox Create(int beat, Rhythms_Editor.TrackTimeline owningTimeline, Vector2 size, UnityAction<int, int> onBeatChanged, UnityAction onBeatApplied)
     {
         RhythmBeatDragBox newBox = new RhythmBeatDragBox();
         newBox._beat = beat;
         newBox._onBeatChanged = onBeatChanged;
+        newBox._onBeatApplied = onBeatApplied;
 
         newBox._owningTimeline = owningTimeline;
         newBox._size = size;
@@ -73,6 +75,7 @@ public class RhythmBeatDragBox
                 {
                     if (_dragActive)
                     {
+                        _onBeatApplied?.Invoke();
                         _dragActive = false;
                     }
                 }

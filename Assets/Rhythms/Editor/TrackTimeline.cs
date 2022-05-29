@@ -322,14 +322,8 @@ namespace Rhythms_Editor
         {
             //Check if the new position is free
 
-            for (int beat = newBeatPos; beat < newBeatPos + state.LengthInBeats; beat++)
-            {
-                if (Track.States.ContainsKey(beat) && Track.States[beat] != state)
-                {
-                    Debug.Log("Unable to move");
-                    return false;
-                }
-            }
+            if (!IsFree(newBeatPos, state))
+                return false;
 
             //Clear the old positions
 
@@ -386,6 +380,19 @@ namespace Rhythms_Editor
         #endregion
 
         #region Helpers
+
+        public bool IsFree(int beat, Rhythms.RhythmState state)
+        {
+            for (int i = beat; i < beat + state.LengthInBeats; i++)
+            {
+                if (Track.States.ContainsKey(i) && Track.States[i] != state)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         public int GetBeatForPosition(Vector2 pos)
         {

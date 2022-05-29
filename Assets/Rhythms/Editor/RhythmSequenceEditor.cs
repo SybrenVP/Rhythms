@@ -40,35 +40,16 @@ namespace Rhythms_Editor
         #endregion
 
         #region States
-
-        private StateDrawer _selectedState = null;
-        public Rhythms.RhythmState SelectedState { get => _selectedState?.State; }
-
-        #endregion
-
-        #region InputState
-
-        private enum InputState
-        {
-            ControlTimeline,
-            MoveState,
-            ResizeState,
-            SelectStates,
-        }
-
-        private InputState _currentInputState = InputState.ControlTimeline;
-        private bool _inputStateActive = false;
-
-        private TrackTimeline _owningTimelineOfInput = null;
-        private Vector2 _lastMousePos = Vector2.zero;
-        private float _offsetToMousePos = 0f; //this is the offset from the selected state to the current mouse pos
+        
+        public Rhythms.RhythmState SelectedState { get => _inputController?.SelectedState?.State; }
 
         #endregion
+        
+        RhythmSequenceEditorInputController _inputController = null;
 
         private Rhythms.RhythmController _controller = null;
 
         private bool _refresh = false;
-        private Vector2 _resizeLastMousePos = Vector2.zero;
 
         [MenuItem("Window/Rhythms/Open editor")]
         public static RhythmSequenceEditor OpenWindow()
@@ -98,6 +79,8 @@ namespace Rhythms_Editor
             InitializeTrackTimelines();
 
             InitializeSequenceInspector();
+
+            InitializeInputController();
         }
 
         private void InitializeTrackTimelines()
@@ -173,6 +156,12 @@ namespace Rhythms_Editor
             Tools.View = new Rect(position.x, 0f, position.width, EditorGUIUtility.singleLineHeight + Toolbar.BUTTON_VERTICAL_OFFSET * 2f);
         }
 
+        private void InitializeInputController()
+        {
+            _inputController = new RhythmSequenceEditorInputController();
+            _inputController.Init(Tools, this);
+        }
+
         protected void OnEnable()
         {
             var controller = Selection.activeGameObject.GetComponent<Rhythms.RhythmController>();
@@ -210,6 +199,11 @@ namespace Rhythms_Editor
             }
 
             EditorApplication.update -= OnTryRepaint;
+        }
+
+        public void Refresh()
+        {
+            _refresh = true;
         }
 
         protected void OnTryRepaint()
@@ -252,83 +246,10 @@ namespace Rhythms_Editor
 
             Tools.OnGUI();
 
-            HandleInput();
-        }
-
-        protected void HandleInput()
-        {            
-            switch (_currentInputState)
-            {
-                case InputState.ControlTimeline:
-                    HandleTimelineControlInput();
-                    break;
-                case InputState.MoveState:
-                    HandleStateMovementInput();
-                    break;
-                case InputState.ResizeState:
-                    HandleResizeStateInput();
-                    break;
-            }
+            _inputController.Update();
         }
 
         #region Timeline Control
-
-        private void HandleTimelineControlInput()
-        {
-            Event e = Event.current;
-
-            int controlID = GUIUtility.GetControlID(_currentInputState.GetHashCode(), FocusType.Passive);
-            int hotControl = GUIUtility.hotControl;
-
-            switch (e.GetTypeForControl(controlID))
-            {
-                case EventType.MouseDown:
-                    if (e.button == 0)
-                    {
-                        if (!_inputStateActive)
-                        {
-                            //get the owning timeline of this input position
-                            _owningTimelineOfInput = TrackTimeline.FindOwningTimeline(this, e.mousePosition);
-                            _inputStateActive = true;
-
-                            _lastMousePos = e.mousePosition;
-
-                            GUIUtility.hotControl = controlID;
-                            e.Use();
-                        }
-                    }
-                    break;
-
-                case EventType.MouseUp:
-                    if (hotControl == controlID)
-                    {
-                        if (_inputStateActive)
-                        {
-                            _owningTimelineOfInput = null;
-                            _inputStateActive = false;
-                        }
-
-                        GUIUtility.hotControl = 0;
-                        e.Use();
-                    }
-
-                    break;
-
-                case EventType.MouseDrag:
-                    if (e.button == 0)
-                    {
-                        if (_inputStateActive)
-                        {
-                            Vector2 diff = e.mousePosition - _lastMousePos;
-                            _owningTimelineOfInput.Scroll(-diff.x);
-
-                            _lastMousePos = e.mousePosition;
-                            _refresh = true;
-                        }
-                    }
-                    break;
-            }
-        }
 
         public void AddTrack()
         {
@@ -363,184 +284,8 @@ namespace Rhythms_Editor
             UpdateTimelines();
         }
 
-        public void AcceptTimelineMovement()
-        {
-            _currentInputState = InputState.ControlTimeline;
-        }
-
 
         #endregion
-
-        #region State Control
-
-        public void AcceptStateMovement()
-        {
-            _currentInputState = InputState.MoveState;
-        }
-
-        public void AcceptStateResize()
-        {
-            _currentInputState = InputState.ResizeState;
-        }
-
-        private void HandleStateSelectingInput()
-        {
-            //This only handles selecting, not deselecting which requires a bunch of checks based on the current tool
-            Event e = Event.current;
-
-            int controlID = GUIUtility.GetControlID(_currentInputState.GetHashCode(), FocusType.Passive);
-            int hotControl = GUIUtility.hotControl;
-
-            switch (e.GetTypeForControl(controlID))
-            {
-                case EventType.MouseDown:
-                    if (e.button == 0)
-                    {
-                        //Get the owning timeline
-                        _owningTimelineOfInput = TrackTimeline.FindOwningTimeline(this, e.mousePosition);
-                        //Convert the mouse pos to the beat pos on this timeline
-                        int beat = _owningTimelineOfInput.GetBeatForPosition(e.mousePosition);
-                        //Get the state responsible for this beat
-                        StateDrawer stateDrawer = _owningTimelineOfInput.GetStateForBeat(beat);
-                        //Check if the click was within the View of the stateDrawer
-                        if (stateDrawer != null && stateDrawer.View.Contains(e.mousePosition))
-                        {
-                            _inputStateActive = true;
-                            _lastMousePos = e.mousePosition;
-                            _offsetToMousePos = _owningTimelineOfInput.GetXForBeat(beat) - _owningTimelineOfInput.GetXForBeat(stateDrawer.Beat);
-                            Debug.Log("Offset to mouse " + _offsetToMousePos);
-
-                            _selectedState = stateDrawer;
-                            GUIUtility.hotControl = controlID;
-                            e.Use();
-                        }
-                    }
-                    break;
-            }
-        }
-
-        private void HandleStateMovementInput()
-        {
-            Event e = Event.current;
-
-            int controlID = GUIUtility.GetControlID(_currentInputState.GetHashCode(), FocusType.Passive);
-            int hotControl = GUIUtility.hotControl;
-
-            HandleStateSelectingInput();
-
-            switch (e.GetTypeForControl(controlID))
-            {
-                case EventType.MouseDown: //If this was not claimed by the drag boxes, we should handle input for deselecting
-
-                    if (e.button == 0)
-                    {
-                        _selectedState = null;
-                        _inputStateActive = false;
-                        _refresh = true;
-
-                        e.Use();
-                    }
-
-                    break;
-
-                case EventType.MouseUp:
-                    if (hotControl == controlID)
-                    {
-                        if (_inputStateActive)
-                        {
-                            _selectedState.SetBeat(_owningTimelineOfInput.GetBeatForPosition(new Vector2(e.mousePosition.x - _offsetToMousePos, e.mousePosition.y)));
-                            if (!_owningTimelineOfInput.MoveStateTo(_selectedState.State, _selectedState.Beat))
-                            {
-                                //TODO: This state (not being able to move here because another state is here) should be caught by creating a new track (pop up box error)
-                                _selectedState.SetBeat(_owningTimelineOfInput.Track.GetBeatForState(_selectedState.State)); 
-                            }
-                            _owningTimelineOfInput = null;
-                            _inputStateActive = false;
-                        }
-
-                        GUIUtility.hotControl = 0;
-                        e.Use();
-                    }
-
-                    break;
-
-                case EventType.MouseDrag:
-                    if (e.button == 0)
-                    {
-                        if (_inputStateActive)
-                        {
-                            bool currentTimeline = _owningTimelineOfInput.View.Contains(e.mousePosition);
-                            if (!currentTimeline)
-                            {
-                                //Get the timeline it belongs to now and cache the old timeline
-                                TrackTimeline newTimeline = TrackTimeline.FindOwningTimeline(_owningTimelineOfInput, e.mousePosition);
-                                if (newTimeline != null)
-                                {
-                                    _owningTimelineOfInput.RemoveState(_selectedState.Beat);
-
-                                    _owningTimelineOfInput = newTimeline;
-                                    _selectedState.OwningTimeline = _owningTimelineOfInput;
-
-                                    _owningTimelineOfInput.AcceptState(_selectedState);
-                                    _selectedState.SetView();
-                                }
-                            }
-
-                            _selectedState.SetBeat(_owningTimelineOfInput.GetBeatForPosition(new Vector2(e.mousePosition.x - _offsetToMousePos, e.mousePosition.y)));
-                            _owningTimelineOfInput.MoveStateTo(_selectedState.State, _selectedState.Beat);
-
-                            _lastMousePos = e.mousePosition;
-
-                            _refresh = true;
-                        }
-                    }
-                    break;
-            }
-        }
-
-        private void HandleResizeStateInput()
-        {
-            Event e = Event.current;
-
-            int controlID = GUIUtility.GetControlID(_currentInputState.GetHashCode(), FocusType.Passive);
-            int hotControl = GUIUtility.hotControl;
-
-            //A selected state should have a box with handles on both sides. allowing to move them left and right
-            HandleStateSelectingInput();
-
-            switch (e.GetTypeForControl(controlID))
-            {
-                case EventType.MouseDown: //If this was not claimed by the drag boxes, we should handle input for deselecting
-
-                    if (e.button == 0)
-                    {
-                        _selectedState?.DeleteBoxHandles();
-                        _selectedState = null;
-                        _inputStateActive = false;
-                        _refresh = true;
-
-                        e.Use();
-                    }
-                     
-                    break;
-            }
-
-            if (_inputStateActive)
-            {
-                _selectedState?.CreateBoxHandles();
-                _refresh = true;
-            }
-        }
-
-        #endregion
-
-        public void DisableCurrentInputState()
-        {
-            _inputStateActive = false;
-            _owningTimelineOfInput = null;
-
-            _selectedState?.DeleteBoxHandles();
-        }
 
         public void SaveSequence()
         {

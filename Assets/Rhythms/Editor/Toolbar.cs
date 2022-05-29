@@ -6,14 +6,16 @@ namespace Rhythms_Editor
 
     public class Toolbar
     {
-        private enum ToolType
+        public enum ToolType
         {
+            Select,
             ViewMove,
             Move,
-            Resize,
-            MultiSelect
+            Resize
         }
 
+        public delegate void ToolbarToolChangeEvent(ToolType newState);
+        public ToolbarToolChangeEvent OnToolChange;
 
         public Rect View;
 
@@ -31,14 +33,14 @@ namespace Rhythms_Editor
         private GUIContent _viewMoveContent = null;
         private GUIContent _moveStateContent = null;
         private GUIContent _resizeStateContent = null;
-        private GUIContent _multiSelectStateContent = null;
+        private GUIContent _selectStateContent = null;
 
         private GUIContent[] _stateToolbarContent = null;
 
         private GUIContent _addTrackButtonContent = null;
 
-        private ToolType _selectedTool = ToolType.ViewMove;
-        private ToolType _nextTool = ToolType.ViewMove;
+        private ToolType _selectedTool = ToolType.Select;
+        private ToolType _nextTool = ToolType.Select;
 
         private Color _backgroundColor = new Color(0.1f, 0.1f, 0.1f, 1f);
 
@@ -57,9 +59,9 @@ namespace Rhythms_Editor
             _viewMoveContent = EditorGUIUtility.IconContent("d_ViewToolMove");
             _moveStateContent = EditorGUIUtility.IconContent("d_Grid.MoveTool");
             _resizeStateContent = EditorGUIUtility.IconContent("ScaleTool On");
-            _multiSelectStateContent = EditorGUIUtility.IconContent("d_RectTool");
+            _selectStateContent = EditorGUIUtility.IconContent("d_RectTool");
 
-            _stateToolbarContent = new GUIContent[] { _viewMoveContent, _moveStateContent, _resizeStateContent, _multiSelectStateContent };
+            _stateToolbarContent = new GUIContent[] { _selectStateContent, _viewMoveContent, _moveStateContent, _resizeStateContent  };
 
             //Track tool bar content
             _addTrackButtonContent = EditorGUIUtility.IconContent("CreateAddNew");
@@ -92,28 +94,9 @@ namespace Rhythms_Editor
         {
             if (_selectedTool != _nextTool)
             {
-                _editor.DisableCurrentInputState();
-
                 _selectedTool = _nextTool;
-            }
 
-            switch (_selectedTool)
-            {
-                case ToolType.ViewMove:
-                    //Grant movement on the track timeline 
-                    _editor.AcceptTimelineMovement();
-                    break;
-                case ToolType.Move:
-                    //Grant State movement capabilities
-                    _editor.AcceptStateMovement();
-                    break;
-                case ToolType.Resize:
-                    //Grant State resize capabilities
-                    _editor.AcceptStateResize();
-                    break;
-                case ToolType.MultiSelect:
-                    //Grant State multiselect capabilities
-                    break;
+                OnToolChange?.Invoke(_selectedTool);
             }
         }
 
