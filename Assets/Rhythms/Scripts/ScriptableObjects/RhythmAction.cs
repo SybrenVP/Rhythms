@@ -17,6 +17,12 @@ namespace Rhythms
 
 #endif
 
-        public abstract void Raise();
+        public abstract void Start();
+
+        public abstract void BeatUpdate();
+
+        public abstract void Update();
+
+        public abstract void Exit();
     }
 }

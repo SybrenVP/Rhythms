@@ -14,6 +14,9 @@ namespace Rhythms_Editor
 
         private readonly float STATE_SIZE_PERCENTAGE = 0.75f;
 
+        private RhythmBeatDragBox _box_1 = null;
+        private RhythmBeatDragBox _box_2 = null;
+
         public StateDrawer(Rhythms.RhythmState state, int beat, TrackTimeline owner)
         {
             State = state;
@@ -53,9 +56,15 @@ namespace Rhythms_Editor
             EditorGUI.DrawRect(View, Color.black);
             Utility.DrawShadowRect(View, new Inset(), 5, Color.grey);
 
+            if (_box_1 != null)
+                _box_1.Draw();
+            if (_box_2 != null)
+                _box_2.Draw();
+
             GUILayout.BeginArea(View);
 
-            GUILayout.Label(State.Actions.Count.ToString());
+            //GUILayout.Label(State.Actions.Count.ToString());
+            GUILayout.Label(State.LengthInBeats.ToString());
 
             GUILayout.EndArea();
         }
@@ -74,7 +83,57 @@ namespace Rhythms_Editor
         {
             Rect owningView = OwningTimeline.View;
 
-            View = new Rect(OwningTimeline.GetXForBeat(Beat), owningView.y + (1 - STATE_SIZE_PERCENTAGE) * 0.5f * owningView.height, OwningTimeline.WidthPerBeat, STATE_SIZE_PERCENTAGE * owningView.height);
+            View = new Rect(OwningTimeline.GetXForBeat(Beat), owningView.y + (1 - STATE_SIZE_PERCENTAGE) * 0.5f * owningView.height, OwningTimeline.WidthPerBeat * State.LengthInBeats, STATE_SIZE_PERCENTAGE * owningView.height);
+        }
+
+        public void CreateBoxHandles()
+        {
+            if (_box_1 == null)
+            {
+                _box_1 = RhythmBeatDragBox.Create(Beat, OwningTimeline, new Vector2(10f, 10f), OnBoxHandleChanged);
+                Debug.Log("created first box handle");
+            }
+
+            if (State.LengthInBeats > 0 && _box_2 == null)
+            {
+                _box_2 = RhythmBeatDragBox.Create(Beat + State.LengthInBeats, OwningTimeline, new Vector2(10f, 10f), OnBoxHandleChanged);
+                Debug.Log("created second box handle");
+            }
+        }
+
+        public void DeleteBoxHandles()
+        {
+            if (_box_1 != null)
+            {
+                _box_1 = null;
+            }
+
+            if (_box_2 != null)
+            {
+                _box_2 = null;
+            }
+        }
+
+        private void OnBoxHandleChanged(int oldBeat, int newBeat)
+        {
+            if (oldBeat == Beat) //First box handle moved
+            { 
+                Beat = newBeat;
+
+                //also need to update Length in Beats
+                State.LengthInBeats += (oldBeat - newBeat);
+            }
+
+            if (oldBeat == Beat + State.LengthInBeats) //Second box handle moved
+            {
+                State.LengthInBeats += (newBeat - oldBeat);
+            }
+
+            Debug.Log(Beat + ", " + State.LengthInBeats);
+
+            OwningTimeline.MoveStateTo(State, Beat);
+
+            SetView();
         }
     }
 }

@@ -53,16 +53,23 @@ namespace Rhythms
 
                 _currentBeatNumber = (int)_songPositionInBeats;
 
+                UpdateSequence();
+
                 if (_previousBeat < _currentBeatNumber)
                 {
                     _previousBeat = _currentBeatNumber;
-                    UpdateSequence();
                 }
+
             }
         }
 
         public void UpdateSequence()
         {
+            if (_previousBeat < _currentBeatNumber)
+            {
+                ActiveSequence.OnBeatUpdate(_currentBeatNumber);
+            }
+
             ActiveSequence.OnUpdate(_currentBeatNumber);
         }
     }

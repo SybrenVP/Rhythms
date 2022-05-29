@@ -97,6 +97,7 @@ namespace Rhythms_Editor
 
         private void InitStateDrawers()
         {
+            List<Rhythms.RhythmState> createdStates = new List<Rhythms.RhythmState>();
             foreach (KeyValuePair<int, Rhythms.RhythmState> state in Track.States)
             {
                 if (state.Value == null)
@@ -107,7 +108,15 @@ namespace Rhythms_Editor
                     return;
                 }
 
-                AddStateDrawer(state.Value, state.Key);
+                if (createdStates.Contains(state.Value))
+                    continue;
+
+                int beat = Track.GetBeatForState(state.Value);
+                if (beat > 0)
+                {
+                    createdStates.Add(state.Value);
+                    AddStateDrawer(state.Value, beat);
+                }
             }
         }
 
@@ -240,7 +249,7 @@ namespace Rhythms_Editor
 
             if (Track.States.ContainsKey(overlappingBeat))
             {
-                menu.AddItem(new GUIContent("Delete State"), false, DeleteState, overlappingBeat);
+                menu.AddItem(new GUIContent("Delete State"), false, RemoveState, overlappingBeat);
                 menu.AddSeparator("");
             }
 
@@ -280,22 +289,30 @@ namespace Rhythms_Editor
             SetDirty();
         }
 
-        public void DeleteState(object beat)
+        public void RemoveState(object beat)
         {
-            Track.States.Remove((int)beat);
-            SetDirty();
+            if (Track.States.ContainsKey((int)beat))
+            {
+                Rhythms.RhythmState state = Track.States[(int)beat];
+                StateDrawer drawerToRemove = _stateDrawers.Find(drawer => drawer.State == state);
 
-            _stateDrawers.RemoveAll(drawer => drawer.Beat == (int)beat);
+                for (int i = 0; i < state.LengthInBeats; i++)
+                {
+                    Track.States.Remove(drawerToRemove.Beat + i);
+                }
+
+                SetDirty();
+
+                _stateDrawers.Remove(drawerToRemove);
+            }
         }
 
         #endregion
 
         public void AcceptState(StateDrawer stateDrawer)
         {
-            if (Track.States.ContainsKey(stateDrawer.Beat))
-                return;
+            MoveStateTo(stateDrawer.State, stateDrawer.Beat);
 
-            Track.States.Add(stateDrawer.Beat, stateDrawer.State);
             SetDirty();
 
             _stateDrawers.Add(stateDrawer);
@@ -303,21 +320,34 @@ namespace Rhythms_Editor
 
         public bool MoveStateTo(Rhythms.RhythmState state, int newBeatPos)
         {
-            if (Track.States.ContainsKey(newBeatPos))
+            //Check if the new position is free
+
+            for (int beat = newBeatPos; beat < newBeatPos + state.LengthInBeats; beat++)
             {
-                if (Track.States[newBeatPos] != state)
+                if (Track.States.ContainsKey(beat) && Track.States[beat] != state)
                 {
-                    Debug.Log("Unable to move here");
+                    Debug.Log("Unable to move");
                     return false;
                 }
-                else
-                    return true;
             }
 
-            int oldBeat = GetBeatForState(state);
+            //Clear the old positions
 
-            Track.States.Add(newBeatPos, state);
-            Track.States.Remove(oldBeat);
+            List<int> oldStatePositions = GetBeatsForState(state);
+            foreach (int oldBeat in oldStatePositions)
+            {
+                Track.States.Remove(oldBeat);
+            }
+
+            //Fill the new positions
+
+            for (int beat = newBeatPos; beat < newBeatPos + state.LengthInBeats; beat++)
+            {
+                if (Track.States.ContainsKey(beat) && Track.States[beat] == state)
+                    continue;
+                else
+                    Track.States.Add(beat, state);
+            }
 
             SetDirty();
 
@@ -366,15 +396,16 @@ namespace Rhythms_Editor
             return result;
         }
 
-        private int GetBeatForState(Rhythms.RhythmState state)
+        private List<int> GetBeatsForState(Rhythms.RhythmState state)
         {
+            List<int> beatResults = new List<int>();
             foreach (var beatState in Track.States)
             {
                 if (beatState.Value == state)
-                    return beatState.Key;
+                    beatResults.Add(beatState.Key);
             }
 
-            return -1;
+            return beatResults;
         }
 
         public float GetXForBeat(int beat)
@@ -384,7 +415,11 @@ namespace Rhythms_Editor
 
         public StateDrawer GetStateForBeat(int beat)
         {
-            return _stateDrawers.Find(drawer => drawer.Beat == beat);
+            if (Track.States.ContainsKey(beat))
+            {
+                return _stateDrawers.Find(drawer => drawer.State == Track.States[beat]);
+            }
+            return null;
         }
 
         #endregion

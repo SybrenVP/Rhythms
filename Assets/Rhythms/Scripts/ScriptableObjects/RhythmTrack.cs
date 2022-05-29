@@ -23,16 +23,34 @@ namespace Rhythms
             Active = active;
         }
 
-        public void OnUpdate(int beatNumber)
+        public void OnUpdate(int currentBeat)
         {
             if (Active)
             {
-                if (States.ContainsKey(beatNumber))
+                if (States.ContainsKey(currentBeat))
                 {
-                    States[beatNumber].Start(); 
+                    States[currentBeat].OnUpdate();
+                }
+            }
+        }
+
+        public void OnBeatUpdate(int currentBeat)
+        {
+            if (Active)
+            {
+                if (States.ContainsKey(currentBeat - 1)) //Check the previous beat to exit it if necessary
+                {
+                    //The currentbeat could be the same state as the previous beat in which case we do not need to exit it yet. 
+                    if (States.ContainsKey(currentBeat) && !States[currentBeat].Active)
+                        States[currentBeat - 1].ExitState();
                 }
 
-                //TODO: Some states are longer than 1 beat, meaning they get to update multiple times
+                if (States.ContainsKey(currentBeat))
+                {
+                    States[currentBeat].OnBeatUpdate();
+                }
+
+                
             }
         }
 
@@ -40,13 +58,21 @@ namespace Rhythms
 
         public int GetBeatForState(RhythmState state)
         {
+            int lowestBeat = int.MaxValue;
+            bool found = false;
             foreach (int key in States.Keys)
             {
-                if (States[key] == state)
-                    return key;
+                if (States[key] == state && key < lowestBeat)
+                {
+                    lowestBeat = key;
+                    found = true;
+                }
             }
 
-            return -1;
+            if (!found)
+                lowestBeat = -1;
+
+            return lowestBeat;
         }
 
         #endregion

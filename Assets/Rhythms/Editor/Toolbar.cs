@@ -109,6 +109,7 @@ namespace Rhythms_Editor
                     break;
                 case ToolType.Resize:
                     //Grant State resize capabilities
+                    _editor.AcceptStateResize();
                     break;
                 case ToolType.MultiSelect:
                     //Grant State multiselect capabilities

@@ -25,12 +25,19 @@ namespace Rhythms
 
         public void OnUpdate(int currentBeat)
         {
-            //We'll check if each active track has a state on the current beat (HasKey), if it does, call Start on the state
             foreach (RhythmTrack track in Tracks)
             {
                 track.OnUpdate(currentBeat);
             }
         }
 
+        public void OnBeatUpdate(int currentBeat)
+        {
+            //We'll check if each active track has a state on the current beat (HasKey), if it does, call BeatUpdate on the state
+            foreach (RhythmTrack track in Tracks)
+            {
+                track.OnUpdate(currentBeat);
+            }
+        }
     }
 }

@@ -124,19 +124,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!114 &150401788
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f5a74b4b11bbc549a8adbf4ba5d6350, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Actions: []
 --- !u!114 &182435910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,8 +165,8 @@ MonoBehaviour:
   Type: 0
   ChangingName: 0
   TempName: ThisIsABool
-  EditingValue: 0
-  Value: 0
+  EditingValue: 1
+  Value: 1
 --- !u!114 &473302557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,24 +182,10 @@ MonoBehaviour:
   Name: Sequence
   Audio: {fileID: 1596850211}
   Tracks:
-  - {fileID: 703505048}
   - {fileID: 728253364}
-  - {fileID: 1954204983}
+  - {fileID: 1463645554}
+  - {fileID: 1091671008}
   Variables: {fileID: 1436749360}
---- !u!114 &475105237
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f5a74b4b11bbc549a8adbf4ba5d6350, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Actions:
-  - {fileID: 1888155602}
 --- !u!114 &512254632
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377,26 +350,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &703505048
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 553a7cc127d68ec489bf2d03e684ef11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ActiveOnStart: 0
-  States:
-    keys: 270000001d00000011000000
-    values:
-    - {fileID: 150401788}
-    - {fileID: 1055084401}
-    - {fileID: 475105237}
-  Active: 0
 --- !u!114 &728253364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -585,19 +538,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Values: []
---- !u!114 &1055084401
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f5a74b4b11bbc549a8adbf4ba5d6350, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Actions: []
 --- !u!114 &1081879043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -611,6 +551,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Values: []
+--- !u!114 &1091671008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 553a7cc127d68ec489bf2d03e684ef11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ActiveOnStart: 0
+  States:
+    keys: 
+    values: []
+  Active: 0
 --- !u!114 &1118184126
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -659,6 +616,30 @@ MonoBehaviour:
   - {fileID: 1204996307}
   - {fileID: 1023315650}
   - {fileID: 1081879043}
+--- !u!114 &1463645554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 553a7cc127d68ec489bf2d03e684ef11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ActiveOnStart: 0
+  States:
+    keys: 19000000180000001700000016000000150000001400000013000000
+    values:
+    - {fileID: 1715047958}
+    - {fileID: 1715047958}
+    - {fileID: 1715047958}
+    - {fileID: 1715047958}
+    - {fileID: 1715047958}
+    - {fileID: 1715047958}
+    - {fileID: 1715047958}
+  Active: 0
 --- !u!114 &1596850211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -675,6 +656,21 @@ MonoBehaviour:
   Loop: 1
   Bpm: 120
   SongOffset: 0
+--- !u!114 &1715047958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f5a74b4b11bbc549a8adbf4ba5d6350, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Actions: []
+  Active: 0
+  LengthInBeats: 7
 --- !u!114 &1734962931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -706,49 +702,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Values:
   - {fileID: 451004162}
---- !u!114 &1888155602
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e41273cc44a50fa43bb1645abbdcefff, type: 3}
-  m_Name: BeatLerp
-  m_EditorClassIdentifier: 
-  Enabled: 1
-  Foldout: 1
-  UseStateLength:
-    Name: New Variable
-    UseConstant: 0
-    Variable: {fileID: 451004162}
-    Constant: 1
-    Type: 0
-  Length:
-    Name: New Variable
-    UseConstant: 0
-    Variable: {fileID: 1734962931}
-    Constant: 1
-    Type: 1
---- !u!114 &1954204983
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 553a7cc127d68ec489bf2d03e684ef11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ActiveOnStart: 0
-  States:
-    keys: 
-    values: []
-  Active: 0
 --- !u!114 &1968344350
 MonoBehaviour:
   m_ObjectHideFlags: 0
