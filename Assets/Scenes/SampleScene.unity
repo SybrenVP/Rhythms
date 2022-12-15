@@ -201,6 +201,7 @@ MonoBehaviour:
   Audio: {fileID: 1596850211}
   Tracks:
   - {fileID: 405770396}
+  - {fileID: 1136724057}
   Variables: {fileID: 1436749360}
 --- !u!114 &512254632
 MonoBehaviour:
@@ -309,6 +310,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -343,6 +345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
@@ -375,6 +378,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -439,6 +443,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
@@ -591,6 +596,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Values: []
+--- !u!114 &1136724057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 553a7cc127d68ec489bf2d03e684ef11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ActiveOnStart: 0
+  States:
+    keys: 
+    values: []
+  Active: 1
 --- !u!114 &1204996307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -642,6 +664,32 @@ MonoBehaviour:
   Loop: 1
   Bpm: 120
   SongOffset: 0
+--- !u!114 &1643443294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e41273cc44a50fa43bb1645abbdcefff, type: 3}
+  m_Name: BeatLerp
+  m_EditorClassIdentifier: 
+  Enabled: 1
+  Foldout: 1
+  UseStateLength:
+    Name: New Variable
+    UseConstant: 0
+    Variable: {fileID: 451004162}
+    Constant: 1
+    Type: 0
+  Length:
+    Name: New Variable
+    UseConstant: 0
+    Variable: {fileID: 0}
+    Constant: 1
+    Type: 1
 --- !u!114 &1734962931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -687,6 +735,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Actions:
   - {fileID: 739129872}
+  - {fileID: 1643443294}
   Active: 0
   LengthInBeats: 1
 --- !u!114 &1968344350

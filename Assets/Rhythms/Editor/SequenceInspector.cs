@@ -5,7 +5,7 @@ namespace Rhythms_Editor
 {
     public class SequenceInspector
     {
-        public Rhythms.RhythmSequence Sequence;
+        public Rhythm.Sequence Sequence;
 
         public Rect View;
         public Vector2 ScrollPosition = Vector2.zero;
@@ -27,7 +27,7 @@ namespace Rhythms_Editor
 
         public static readonly float MINWIDTH = 400f;
 
-        public SequenceInspector(Rhythms.RhythmSequence sequence, RhythmSequenceEditor editor)
+        public SequenceInspector(Rhythm.Sequence sequence, RhythmSequenceEditor editor)
         {
             Sequence = sequence;
             _editor = editor;
@@ -79,12 +79,12 @@ namespace Rhythms_Editor
 
         #region StateInspector
 
-        private void DrawStateInspector(Rhythms.RhythmState state)
+        private void DrawStateInspector(Rhythm.State state)
         {
             if (!state)
                 return;
 
-            foreach (Rhythms.RhythmAction action in state.Actions)
+            foreach (Rhythm.Action action in state.Actions)
             {
                 //Create serializedObject and prepare for drawing the inspectors
                 var so = new SerializedObject(action);
@@ -98,7 +98,7 @@ namespace Rhythms_Editor
         }
 
         //Returns if the foldout is open
-        private bool DrawActionHeader(SerializedObject so, Rhythms.RhythmAction action)
+        private bool DrawActionHeader(SerializedObject so, Rhythm.Action action)
         {
             //Create a rect for the action header
             Rect horizontalRect = EditorGUILayout.BeginHorizontal(EditorStyles.toolbarButton);
@@ -149,7 +149,7 @@ namespace Rhythms_Editor
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
         }
 
-        private void DrawAddAction(Rhythms.RhythmState state)
+        private void DrawAddAction(Rhythm.State state)
         {
             GUILayout.Space(30f);
 
@@ -169,7 +169,7 @@ namespace Rhythms_Editor
             GUILayout.Space(30f);
         }
 
-        private void CreateActionContextMenu(Rhythms.RhythmAction action)
+        private void CreateActionContextMenu(Rhythm.Action action)
         {
             GenericMenu menu = new GenericMenu();
 
@@ -180,12 +180,12 @@ namespace Rhythms_Editor
 
         private void RemoveAction(object action)
         {
-            _editor.SelectedState.Actions.Remove((Rhythms.RhythmAction)action);
+            _editor.SelectedState.Actions.Remove((Rhythm.Action)action);
         }
 
-        protected void OnActionAdded(System.Type type, Rhythms.RhythmState state)
+        protected void OnActionAdded(System.Type type, Rhythm.State state)
         {
-            Rhythms.RhythmAction action = (Rhythms.RhythmAction)ScriptableObject.CreateInstance(type);
+            Rhythm.Action action = (Rhythm.Action)ScriptableObject.CreateInstance(type);
             action.name = type.Name;
             state.Actions.Add(action);
         }
@@ -207,7 +207,7 @@ namespace Rhythms_Editor
 
             if (GUILayout.Button("Add variable", EditorStyles.toolbarButton))
             {
-                Rhythms.R_VariableSO newVar = Sequence.Variables.CreateNewVariable((Rhythms.VariableType)_selectedVariableTypeId);
+                Rhythm.R_VariableSO newVar = Sequence.Variables.CreateNewVariable((Rhythm.VariableType)_selectedVariableTypeId);
                 int loopCount = 0;
                 while (Sequence.Variables.DoesNameExist(newVar.Type, newVar.name, newVar))
                 {
@@ -225,7 +225,7 @@ namespace Rhythms_Editor
 
             GUILayout.BeginVertical(Sequence.Variables.Count > 0 ? EditorStyles.helpBox : GUIStyle.none);
 
-            foreach (Rhythms.R_VariableSO var in Sequence.Variables)
+            foreach (Rhythm.R_VariableSO var in Sequence.Variables)
             {
                 if (var == null)
                 {
@@ -281,7 +281,7 @@ namespace Rhythms_Editor
             GUILayout.EndVertical();
         }
 
-        private void DrawEditFieldForVariable(Rhythms.R_VariableSO variable)
+        private void DrawEditFieldForVariable(Rhythm.R_VariableSO variable)
         {
             EditorGUI.BeginChangeCheck();
 

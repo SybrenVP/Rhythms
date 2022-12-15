@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using Rhythms;
+using Rhythm;
 using System.Collections.Generic;
 
 #region Bool

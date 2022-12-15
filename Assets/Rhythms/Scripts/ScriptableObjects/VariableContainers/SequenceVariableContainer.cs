@@ -7,7 +7,7 @@ using UnityEditor;
 
 #endif
 
-namespace Rhythms
+namespace Rhythm
 {
     [System.Serializable]
     public abstract class SequenceVariableContainer : ScriptableObject

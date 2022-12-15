@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rhythms
+namespace Rhythm
 {
     [CreateAssetMenu(fileName = "NewSequence", menuName = "Rhythms/Create Sequence", order = 0)]
     [System.Serializable]
-    public class RhythmSequence : ScriptableObject
+    public class Sequence : ScriptableObject
     {
         public string Name = "Sequence";
 
         public AudioData Audio = null;
 
         //Has multiple tracks, tracks contain rhythm states
-        public List<RhythmTrack> Tracks = new List<RhythmTrack>();
+        public List<Track> Tracks = new List<Track>();
 
         public SequenceVariables Variables;
 
@@ -25,7 +25,7 @@ namespace Rhythms
 
         public void Start()
         {
-            foreach (RhythmTrack track in Tracks)
+            foreach (Track track in Tracks)
             {
                 track.Start();
             }
@@ -33,7 +33,7 @@ namespace Rhythms
 
         public void OnUpdate(int currentBeat)
         {
-            foreach (RhythmTrack track in Tracks)
+            foreach (Track track in Tracks)
             {
                 track.OnUpdate(currentBeat);
             }
@@ -42,7 +42,7 @@ namespace Rhythms
         public void OnBeatUpdate(int currentBeat)
         {
             //We'll check if each active track has a state on the current beat (HasKey), if it does, call BeatUpdate on the state
-            foreach (RhythmTrack track in Tracks)
+            foreach (Track track in Tracks)
             {
                 track.OnUpdate(currentBeat);
             }

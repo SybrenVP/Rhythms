@@ -196,7 +196,7 @@ namespace Rhythms_Editor
 
         public static List<string> GetVariableList()
         {
-            System.Array enumArray = System.Enum.GetValues(typeof(Rhythms.VariableType));
+            System.Array enumArray = System.Enum.GetValues(typeof(Rhythm.VariableType));
             List<string> result = new List<string>();
             foreach (var variableType in enumArray)
             {

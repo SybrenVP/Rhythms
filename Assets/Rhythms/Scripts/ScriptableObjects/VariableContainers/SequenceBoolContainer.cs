@@ -7,7 +7,7 @@ using UnityEditor;
 
 #endif
 
-namespace Rhythms
+namespace Rhythm
 {
 
     [System.Serializable]
@@ -61,7 +61,7 @@ namespace Rhythms
 
         public override void GUIField(string label, R_VariableSO variable)
         {
-            (variable as R_BoolSO).Value = EditorGUILayout.Toggle(label, (variable as Rhythms.R_BoolSO).Value);
+            (variable as R_BoolSO).Value = EditorGUILayout.Toggle(label, (variable as R_BoolSO).Value);
         }
 
 #endif

@@ -7,7 +7,7 @@ namespace Rhythms_Editor
     {
         public TrackTimeline OwningTimeline = null;
 
-        public Rhythms.RhythmState State = null;
+        public Rhythm.State State = null;
         public int Beat = -1;
         public int LengthInBeats = 1;
 
@@ -25,7 +25,7 @@ namespace Rhythms_Editor
         private Color _backgroundColor = Color.black;
         private Color _shadowColor = Color.grey;
 
-        public StateDrawer(Rhythms.RhythmState state, int beat, TrackTimeline owner, RhythmSequenceEditor editor)
+        public StateDrawer(Rhythm.State state, int beat, TrackTimeline owner, RhythmSequenceEditor editor)
         {
             State = state;
             Beat = beat;

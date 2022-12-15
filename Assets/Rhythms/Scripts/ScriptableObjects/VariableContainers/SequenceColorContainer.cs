@@ -7,7 +7,7 @@ using UnityEditor;
 
 #endif
 
-namespace Rhythms
+namespace Rhythm
 {
     [System.Serializable]
     public class SequenceColorContainer : SequenceVariableContainer
@@ -62,7 +62,7 @@ namespace Rhythms
 
         public override void GUIField(string label, R_VariableSO variable)
         {
-            (variable as Rhythms.R_ColorSO).Value = EditorGUILayout.ColorField("Value", (variable as Rhythms.R_ColorSO).Value);
+            (variable as R_ColorSO).Value = EditorGUILayout.ColorField("Value", (variable as R_ColorSO).Value);
         }
 
 #endif

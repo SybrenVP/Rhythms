@@ -11,7 +11,7 @@ namespace Rhythms_Editor
     /// </summary>
     public class RhythmSequenceEditor : EditorWindow
     {
-        public Rhythms.RhythmSequence ActiveSequence = null;
+        public Rhythm.Sequence ActiveSequence = null;
 
         public Rect Rect_EditorWindow;
 
@@ -41,14 +41,14 @@ namespace Rhythms_Editor
 
         #region States
         
-        public Rhythms.RhythmState SelectedState { get => _inputController?.SelectedState?.State; }
+        public Rhythm.State SelectedState { get => _inputController?.SelectedState?.State; }
 
         #endregion
         
         private RhythmSequenceEditorInputController _inputController = null;
         private EditorActionStack _actionStack = null;
 
-        private Rhythms.RhythmController _controller = null;
+        private Rhythm.RhythmController _controller = null;
 
         private bool _refresh = false;
 
@@ -63,7 +63,7 @@ namespace Rhythms_Editor
             return editorWindow;
         }
 
-        public void OpenSequenceFromController(Rhythms.RhythmController controller, Rhythms.RhythmSequence sequence) 
+        public void OpenSequenceFromController(Rhythm.RhythmController controller, Rhythm.Sequence sequence) 
         {
             ActiveSequence = sequence;
             _controller = controller;
@@ -71,7 +71,7 @@ namespace Rhythms_Editor
             Timelines.Clear(); 
 
             if (ActiveSequence == null)
-                ActiveSequence = ScriptableObject.CreateInstance<Rhythms.RhythmSequence>();
+                ActiveSequence = ScriptableObject.CreateInstance<Rhythm.Sequence>();
 
             Rect_EditorWindow = new Rect(Vector2.zero, position.size);
 
@@ -123,7 +123,7 @@ namespace Rhythms_Editor
             return size;
         }
 
-        private void CreateTimeline(float height, float width, Rhythms.RhythmTrack track)
+        private void CreateTimeline(float height, float width, Rhythm.Track track)
         {
             Color trackBackground = Timelines.Count % 2 == 1 ? new Color(0.30f, 0.30f, 0.30f, 1f) : new Color(0.20f, 0.20f, 0.20f, 1f);
 
@@ -172,7 +172,7 @@ namespace Rhythms_Editor
 
         protected void OnEnable()
         {
-            var controller = Selection.activeGameObject.GetComponent<Rhythms.RhythmController>();
+            var controller = Selection.activeGameObject.GetComponent<Rhythm.RhythmController>();
             if (controller)
             {
                 OpenSequenceFromController(controller, controller.ActiveSequence);
@@ -189,7 +189,7 @@ namespace Rhythms_Editor
         {
             if (Selection.activeGameObject)
             {
-                _controller = Selection.activeGameObject.GetComponent<Rhythms.RhythmController>();
+                _controller = Selection.activeGameObject.GetComponent<Rhythm.RhythmController>();
                 if (_controller)
                 {
                     OpenSequenceFromController(_controller, _controller.ActiveSequence);
@@ -272,7 +272,7 @@ namespace Rhythms_Editor
 
         public void AddTrack()
         {
-            Rhythms.RhythmTrack newTrack = ScriptableObject.CreateInstance<Rhythms.RhythmTrack>();
+            Rhythm.Track newTrack = ScriptableObject.CreateInstance<Rhythm.Track>();
             ActiveSequence.Tracks.Add(newTrack);
 
             SaveSequence();
@@ -285,7 +285,7 @@ namespace Rhythms_Editor
 
         public void RemoveTrack(object track)
         {
-            int trackIndex = ActiveSequence.Tracks.IndexOf((Rhythms.RhythmTrack)track);
+            int trackIndex = ActiveSequence.Tracks.IndexOf((Rhythm.Track)track);
             if (trackIndex < 0)
             {
                 Debug.LogWarning("Found a track that is not present in the Created Tracks. Clearing all corrupted data."); //Temporary null catch, this will only be called if serialization is failing

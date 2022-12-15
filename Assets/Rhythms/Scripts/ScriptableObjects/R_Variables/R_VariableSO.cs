@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rhythms
+namespace Rhythm
 {
     /// <summary>
     /// This a scriptable object class for variables, this is the class used by R_Variable to save away the variable data if requested by designers

@@ -7,7 +7,7 @@ using UnityEditor;
 
 #endif
 
-namespace Rhythms
+namespace Rhythm
 {
     [System.Serializable]
     public class SequenceFloatContainer : SequenceVariableContainer
@@ -60,7 +60,7 @@ namespace Rhythms
 
         public override void GUIField(string label, R_VariableSO variable)
         {
-            (variable as Rhythms.R_FloatSO).Value = EditorGUILayout.FloatField(label, (variable as Rhythms.R_FloatSO).Value);
+            (variable as R_FloatSO).Value = EditorGUILayout.FloatField(label, (variable as R_FloatSO).Value);
         }
 
 #endif

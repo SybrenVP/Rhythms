@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rhythms
+namespace Rhythm
 {
     [System.Serializable]
-    public class IntStateDictionary : SerializableDictionary<int, RhythmState> { }
+    public class IntStateDictionary : SerializableDictionary<int, State> { }
 
     [System.Serializable]
-    public class RhythmTrack : ScriptableObject
+    public class Track : ScriptableObject
     {
         public bool ActiveOnStart = false;
 
@@ -67,7 +67,7 @@ namespace Rhythms
 
         #region Accessors
 
-        public int GetBeatForState(RhythmState state)
+        public int GetBeatForState(State state)
         {
             int lowestBeat = int.MaxValue;
             bool found = false;

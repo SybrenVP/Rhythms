@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rhythms
+namespace Rhythm
 {
-
     [CreateAssetMenu(fileName = "NewAudioData", menuName = "Rhythms/Create Audio Data")]
     public class AudioData : ScriptableObject
     {

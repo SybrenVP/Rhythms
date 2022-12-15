@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Rhythms
+namespace Rhythm
 {
     //Example action
-    public class BeatLerp : RhythmAction
+    public class BeatLerp : Action
     {
         public R_Bool UseStateLength = new R_Bool(true);
 

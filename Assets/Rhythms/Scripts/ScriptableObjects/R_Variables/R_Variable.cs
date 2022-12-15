@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Rhythms
+namespace Rhythm
 {
     #region Base
 

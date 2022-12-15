@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rhythms
+namespace Rhythm
 {
     [System.Serializable]
-    public class RhythmState : ScriptableObject
+    public class State : ScriptableObject
     {
-        public List<RhythmAction> Actions = new List<RhythmAction>();
+        public List<Action> Actions = new List<Action>();
 
         public bool Active = false;
 
@@ -16,7 +16,7 @@ namespace Rhythms
 
         public void OnTimelineActivate()
         {
-            foreach (RhythmAction action in Actions)
+            foreach (Action action in Actions)
             {
                 if (action.Enabled)
                     action.OnTimelineActivate();
@@ -25,7 +25,7 @@ namespace Rhythms
 
         public void OnTimelineDisable()
         {
-            foreach (RhythmAction action in Actions)
+            foreach (Action action in Actions)
             {
                 if (action.Enabled)
                     action.OnTimelineDisable();
@@ -34,7 +34,7 @@ namespace Rhythms
 
         public void Start()
         {
-            foreach (RhythmAction action in Actions)
+            foreach (Action action in Actions)
             {
                 if (action.Enabled)
                     action.Start();
@@ -54,7 +54,7 @@ namespace Rhythms
 
             if (Active)
             {
-                foreach (RhythmAction action in Actions)
+                foreach (Action action in Actions)
                 {
                     if (action.Enabled)
                         action.BeatUpdate();
@@ -66,7 +66,7 @@ namespace Rhythms
         {
             if (Active)
             {
-                foreach (RhythmAction action in Actions)
+                foreach (Action action in Actions)
                 {
                     if (action.Enabled)
                         action.Update();
@@ -78,7 +78,7 @@ namespace Rhythms
         {
             if (Active)
             {
-                foreach (RhythmAction action in Actions)
+                foreach (Action action in Actions)
                 {
                     if (action.Enabled)
                         action.Exit();

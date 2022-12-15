@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rhythms
+namespace Rhythm
 {
-    public class InputAction : RhythmAction
+    public class InputAction : Action
     {
         public KeyCode InputKey = KeyCode.Space;
 

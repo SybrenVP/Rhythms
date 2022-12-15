@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Rhythms
+namespace Rhythm
 {
     /// <summary>
     /// This class will hold lists of all variables

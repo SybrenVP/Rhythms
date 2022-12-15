@@ -6,7 +6,7 @@ namespace Rhythms_Editor
     /// <summary>
     /// Adds some visual information in the Unity inspector, useful for designers / debugging
     /// </summary>
-    [CustomEditor(typeof(Rhythms.RhythmController))]
+    [CustomEditor(typeof(Rhythm.RhythmController))]
     public class RhythmControllerEditor : Editor
     {
         private SerializedObject _so;
@@ -24,7 +24,7 @@ namespace Rhythms_Editor
         {  
             _so.Update();
 
-            Rhythms.RhythmController controller = target as Rhythms.RhythmController;
+            Rhythm.RhythmController controller = target as Rhythm.RhythmController;
 
             using (new GUILayout.VerticalScope(EditorStyles.helpBox))
             {
@@ -50,7 +50,7 @@ namespace Rhythms_Editor
                     {
                         if (controller.ActiveSequence.Audio != null)
                         {
-                            Rhythms.AudioData audioData = controller.ActiveSequence.Audio;
+                            Rhythm.AudioData audioData = controller.ActiveSequence.Audio;
                             using (new GUILayout.VerticalScope("Audio data", EditorStyles.helpBox))
                             {
                                 GUILayout.Space(EditorGUIUtility.singleLineHeight);

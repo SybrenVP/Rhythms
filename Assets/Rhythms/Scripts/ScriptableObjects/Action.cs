@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Rhythms
+namespace Rhythm
 {
-
     [System.Serializable]
-    public abstract class RhythmAction : ScriptableObject
+    public abstract class Action : ScriptableObject
     {
         [HideInInspector]
         public bool Enabled = true;

@@ -32,7 +32,7 @@ public abstract class R_VariablePropertyDrawer : PropertyDrawer
         }
         else
         {
-            var seq = Selection.activeGameObject.GetComponent<Rhythms.RhythmController>().ActiveSequence;
+            var seq = Selection.activeGameObject.GetComponent<Rhythm.RhythmController>().ActiveSequence;
 
             _varType_prop = property.FindPropertyRelative("Type");
             if (_varType_prop == null)
@@ -40,12 +40,12 @@ public abstract class R_VariablePropertyDrawer : PropertyDrawer
                 Debug.LogError("Could not find the Type of this R_Variable");
                 return;
             }
-            List<Rhythms.R_VariableSO> possibleVars = GetAllVariablesOfType(seq);
+            List<Rhythm.R_VariableSO> possibleVars = GetAllVariablesOfType(seq);
             List<string> options = ConvertVariableListToOptionList(possibleVars);
     
             _variable_prop = property.FindPropertyRelative("Variable");
 
-            Rhythms.R_VariableSO selectedVar =  possibleVars.Find(result => result != null && _variable_prop.objectReferenceValue == result);
+            Rhythm.R_VariableSO selectedVar =  possibleVars.Find(result => result != null && _variable_prop.objectReferenceValue == result);
             int i = possibleVars.IndexOf(selectedVar);
             if (i < 0)
                 i = 0;
@@ -53,7 +53,7 @@ public abstract class R_VariablePropertyDrawer : PropertyDrawer
             int newSelection = EditorGUI.Popup(varRect, property.displayName, i, options.ToArray());
             if (newSelection != i)
             {
-                _variable_prop.objectReferenceValue = seq.Variables.GetVarByName((Rhythms.VariableType)_varType_prop.enumValueIndex, options[newSelection]);
+                _variable_prop.objectReferenceValue = seq.Variables.GetVarByName((Rhythm.VariableType)_varType_prop.enumValueIndex, options[newSelection]);
             }
         }
     
@@ -70,12 +70,12 @@ public abstract class R_VariablePropertyDrawer : PropertyDrawer
         EditorGUI.EndProperty();
     }
     
-    protected List<Rhythms.R_VariableSO> GetAllVariablesOfType(Rhythms.RhythmSequence seq)
+    protected List<Rhythm.R_VariableSO> GetAllVariablesOfType(Rhythm.Sequence seq)
     {
-        List<Rhythms.R_VariableSO> result = new List<Rhythms.R_VariableSO>();
+        List<Rhythm.R_VariableSO> result = new List<Rhythm.R_VariableSO>();
         result.Add(null);
     
-        foreach (Rhythms.R_VariableSO variable in seq.Variables)
+        foreach (Rhythm.R_VariableSO variable in seq.Variables)
         {
             if (variable == null)
                 continue;
@@ -87,17 +87,17 @@ public abstract class R_VariablePropertyDrawer : PropertyDrawer
         return result;
     }
 
-    protected bool IsType(Rhythms.R_VariableSO var)
+    protected bool IsType(Rhythm.R_VariableSO var)
     {
-        return var.Type == (Rhythms.VariableType)_varType_prop.enumValueIndex;
+        return var.Type == (Rhythm.VariableType)_varType_prop.enumValueIndex;
     }
     
-    protected List<string> ConvertVariableListToOptionList(List<Rhythms.R_VariableSO> vars)
+    protected List<string> ConvertVariableListToOptionList(List<Rhythm.R_VariableSO> vars)
     {
         List<string> result = new List<string>();
         result.Add("None");
     
-        foreach (Rhythms.R_VariableSO var in vars)
+        foreach (Rhythm.R_VariableSO var in vars)
         {
             if (var == null)
                 continue;

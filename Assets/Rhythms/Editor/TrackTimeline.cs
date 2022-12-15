@@ -8,8 +8,8 @@ namespace Rhythms_Editor
 
     public class TrackTimeline
     {
-        public Rhythms.RhythmTrack Track = null;
-        public Rhythms.AudioData Audio = null;
+        public Rhythm.Track Track = null;
+        public Rhythm.AudioData Audio = null;
 
         public static Texture2D AudioWaveform;
 
@@ -70,7 +70,7 @@ namespace Rhythms_Editor
 
         #region Init
 
-        public TrackTimeline(Rhythms.RhythmTrack track, Rhythms.AudioData audioData, RhythmSequenceEditor editor, Rect reservedView, Color background)
+        public TrackTimeline(Rhythm.Track track, Rhythm.AudioData audioData, RhythmSequenceEditor editor, Rect reservedView, Color background)
         {
             _editor = editor;
 
@@ -97,8 +97,8 @@ namespace Rhythms_Editor
 
         private void InitStateDrawers()
         {
-            List<Rhythms.RhythmState> createdStates = new List<Rhythms.RhythmState>();
-            foreach (KeyValuePair<int, Rhythms.RhythmState> state in Track.States)
+            List<Rhythm.State> createdStates = new List<Rhythm.State>();
+            foreach (KeyValuePair<int, Rhythm.State> state in Track.States)
             {
                 if (state.Value == null)
                 {
@@ -120,7 +120,7 @@ namespace Rhythms_Editor
             }
         }
 
-        private void AddStateDrawer(Rhythms.RhythmState state, int beat)
+        private void AddStateDrawer(Rhythm.State state, int beat)
         {
             StateDrawer newStateDrawer = new StateDrawer(state, beat, this, _editor);
             _stateDrawers.Add(newStateDrawer);
@@ -288,7 +288,7 @@ namespace Rhythms_Editor
                 return;
             }
 
-            Rhythms.RhythmState newState = (Rhythms.RhythmState)ScriptableObject.CreateInstance(typeof(Rhythms.RhythmState));
+            Rhythm.State newState = (Rhythm.State)ScriptableObject.CreateInstance(typeof(Rhythm.State));
             Track.States.Add(beatNumber, newState);
             SetDirty();
 
@@ -307,7 +307,7 @@ namespace Rhythms_Editor
         {
             if (Track.States.ContainsKey((int)beat))
             {
-                Rhythms.RhythmState state = Track.States[(int)beat];
+                Rhythm.State state = Track.States[(int)beat];
                 StateDrawer drawerToRemove = _stateDrawers.Find(drawer => drawer.State == state);
 
                 for (int i = 0; i < state.LengthInBeats; i++)
@@ -332,7 +332,7 @@ namespace Rhythms_Editor
             _stateDrawers.Add(stateDrawer);
         }
 
-        public bool MoveStateTo(Rhythms.RhythmState state, int newBeatPos)
+        public bool MoveStateTo(Rhythm.State state, int newBeatPos)
         {
             //Check if the new position is free
 
@@ -395,7 +395,7 @@ namespace Rhythms_Editor
 
         #region Helpers
 
-        public bool IsFree(int beat, Rhythms.RhythmState state)
+        public bool IsFree(int beat, Rhythm.State state)
         {
             for (int i = beat; i < beat + state.LengthInBeats; i++)
             {
@@ -417,7 +417,7 @@ namespace Rhythms_Editor
             return result;
         }
 
-        private List<int> GetBeatsForState(Rhythms.RhythmState state)
+        private List<int> GetBeatsForState(Rhythm.State state)
         {
             List<int> beatResults = new List<int>();
             foreach (var beatState in Track.States)

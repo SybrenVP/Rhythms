@@ -4,12 +4,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rhythms
+namespace Rhythm
 {
     [RequireComponent(typeof(AudioSource))]
     public class RhythmController : MonoBehaviour
     {
-        public RhythmSequence ActiveSequence = null;
+        public Sequence ActiveSequence = null;
 
         private AudioSource _activeSource = null;
 
@@ -30,7 +30,7 @@ namespace Rhythms
             Play();
         }
 
-        public void Load(RhythmSequence sequence)
+        public void Load(Sequence sequence)
         {
             ActiveSequence = Instantiate(sequence); //TODO: This has to be removed probably
             _activeAudio = ActiveSequence.Audio;

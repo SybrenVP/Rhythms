@@ -9,10 +9,10 @@ public class ActionDropdown : AdvancedDropdown
 {
     public Dictionary<string, System.Type> Actions = new Dictionary<string, System.Type>();
 
-    private Rhythms.RhythmState _state = null;
-    protected System.Action<System.Type, Rhythms.RhythmState> _onActionSelected;
+    private Rhythm.State _state = null;
+    protected System.Action<System.Type, Rhythm.State> _onActionSelected;
 
-    public ActionDropdown(AdvancedDropdownState state, System.Action<System.Type, Rhythms.RhythmState> onActionSelected, Rhythms.RhythmState rhythmState) : base(state)
+    public ActionDropdown(AdvancedDropdownState state, System.Action<System.Type, Rhythm.State> onActionSelected, Rhythm.State rhythmState) : base(state)
     {
         _onActionSelected = onActionSelected;
         _state = rhythmState;
@@ -22,7 +22,7 @@ public class ActionDropdown : AdvancedDropdown
     {
         var root = new AdvancedDropdownItem("Action");
 
-        List<System.Type> actions = Rhythms_Editor.Utility.GetAllSubclassesOf(typeof(Rhythms.RhythmAction));
+        List<System.Type> actions = Rhythms_Editor.Utility.GetAllSubclassesOf(typeof(Rhythm.Action));
 
         foreach (System.Type type in actions)
         {

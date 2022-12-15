@@ -7,7 +7,7 @@ using UnityEditor;
 
 #endif
 
-namespace Rhythms
+namespace Rhythm
 {
     [System.Serializable]
     public class SequenceVector3Container : SequenceVariableContainer
@@ -60,7 +60,7 @@ namespace Rhythms
 
         public override void GUIField(string label, R_VariableSO variable)
         {
-            (variable as Rhythms.R_Vector3SO).Value = EditorGUILayout.Vector3Field("Value", (variable as Rhythms.R_Vector3SO).Value);
+            (variable as R_Vector3SO).Value = EditorGUILayout.Vector3Field("Value", (variable as R_Vector3SO).Value);
         }
 
 #endif

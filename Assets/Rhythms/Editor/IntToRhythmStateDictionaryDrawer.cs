@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[UnityEditor.CustomPropertyDrawer(typeof(Rhythms.IntStateDictionary))]
-public class IntStateDictionaryDrawer : SerializableDictionaryDrawer<int, Rhythms.RhythmState>
+[UnityEditor.CustomPropertyDrawer(typeof(Rhythm.IntStateDictionary))]
+public class IntStateDictionaryDrawer : SerializableDictionaryDrawer<int, Rhythm.State>
 {
-    protected override SerializableKeyValueTemplate<int, Rhythms.RhythmState> GetTemplate()
+    protected override SerializableKeyValueTemplate<int, Rhythm.State> GetTemplate()
     {
         return GetGenericTemplate<SerializableIntStateTemplate>();
     }
 }
-internal class SerializableIntStateTemplate : SerializableKeyValueTemplate<int, Rhythms.RhythmState> { }
+internal class SerializableIntStateTemplate : SerializableKeyValueTemplate<int, Rhythm.State> { }
