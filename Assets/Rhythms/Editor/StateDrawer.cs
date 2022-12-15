@@ -20,16 +20,20 @@ namespace Rhythms_Editor
 
         private StateDrawer _ghost = null;
 
+        private RhythmSequenceEditor _editor;
+
         private Color _backgroundColor = Color.black;
         private Color _shadowColor = Color.grey;
 
-        public StateDrawer(Rhythms.RhythmState state, int beat, TrackTimeline owner)
+        public StateDrawer(Rhythms.RhythmState state, int beat, TrackTimeline owner, RhythmSequenceEditor editor)
         {
             State = state;
             Beat = beat;
             LengthInBeats = state.LengthInBeats;
 
             OwningTimeline = owner;
+
+            _editor = editor;
 
             SetView();
         }
@@ -158,6 +162,9 @@ namespace Rhythms_Editor
 
         private void OnBoxHandleApplied()
         {
+            RhythmToolStateMoveAction newChange = new RhythmToolStateMoveAction(this, OwningTimeline, _ghost.OwningTimeline, Beat, _ghost.Beat, LengthInBeats, _ghost.LengthInBeats);
+            _editor.RecordChange(newChange);
+
             ApplyGhost(false);
         }
 
@@ -174,7 +181,7 @@ namespace Rhythms_Editor
                 return;
             }
 
-            _ghost = new StateDrawer(State, Beat, OwningTimeline);
+            _ghost = new StateDrawer(State, Beat, OwningTimeline, _editor);
             _ghost._backgroundColor.a *= .5f;
         }
 

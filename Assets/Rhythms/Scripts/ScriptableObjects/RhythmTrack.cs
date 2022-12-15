@@ -15,12 +15,23 @@ namespace Rhythms
         //int is a beat number, each beat can contain a state, to have multiple states on the same beat, you need to use multiple tracks. This needs to be a serializable dictionary
         public IntStateDictionary States = new IntStateDictionary();
 
-        [HideInInspector, SerializeField] public bool Active = false;
+        [HideInInspector, SerializeField] public bool Active = true;
 
         //Allows us to disable and enable tracks at runtime, kind of like making a choice in a story game
         public void SetActive(bool active)
         {
             Active = active;
+        }
+
+        public void Start()
+        {
+            if (Active)
+            {
+                foreach (var state in States)
+                {
+                    state.Value.OnTimelineActivate();
+                }
+            }
         }
 
         public void OnUpdate(int currentBeat)

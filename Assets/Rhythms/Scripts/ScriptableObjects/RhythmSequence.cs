@@ -23,6 +23,14 @@ namespace Rhythms
                 Audio = CreateInstance<AudioData>();
         }
 
+        public void Start()
+        {
+            foreach (RhythmTrack track in Tracks)
+            {
+                track.Start();
+            }
+        }
+
         public void OnUpdate(int currentBeat)
         {
             foreach (RhythmTrack track in Tracks)

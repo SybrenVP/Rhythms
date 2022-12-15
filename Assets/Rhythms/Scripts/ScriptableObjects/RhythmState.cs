@@ -14,6 +14,24 @@ namespace Rhythms
         //If the length is 0, it will only play Start
         public int LengthInBeats = 1;
 
+        public void OnTimelineActivate()
+        {
+            foreach (RhythmAction action in Actions)
+            {
+                if (action.Enabled)
+                    action.OnTimelineActivate();
+            }
+        }
+
+        public void OnTimelineDisable()
+        {
+            foreach (RhythmAction action in Actions)
+            {
+                if (action.Enabled)
+                    action.OnTimelineDisable();
+            }
+        }
+
         public void Start()
         {
             foreach (RhythmAction action in Actions)

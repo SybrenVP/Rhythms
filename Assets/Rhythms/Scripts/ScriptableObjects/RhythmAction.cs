@@ -17,6 +17,10 @@ namespace Rhythms
 
 #endif
 
+        public abstract void OnTimelineActivate();
+
+        public abstract void OnTimelineDisable();
+
         public abstract void Start();
 
         public abstract void BeatUpdate();

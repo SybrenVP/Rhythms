@@ -25,6 +25,9 @@ namespace Rhythms
         private void Start()
         {
             _activeSource = GetComponent<AudioSource>();
+
+            Load(ActiveSequence);
+            Play();
         }
 
         public void Load(RhythmSequence sequence)
@@ -42,6 +45,7 @@ namespace Rhythms
         {
             _startTime = Time.time;
             _activeSource.Play();
+            ActiveSequence.Start();
         }
 
         public void Update()

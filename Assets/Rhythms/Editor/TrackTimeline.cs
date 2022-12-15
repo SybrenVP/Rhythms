@@ -122,7 +122,7 @@ namespace Rhythms_Editor
 
         private void AddStateDrawer(Rhythms.RhythmState state, int beat)
         {
-            StateDrawer newStateDrawer = new StateDrawer(state, beat, this);
+            StateDrawer newStateDrawer = new StateDrawer(state, beat, this, _editor);
             _stateDrawers.Add(newStateDrawer);
         }
 

@@ -292,7 +292,7 @@ namespace Rhythms_Editor
         private void RecordGhost()
         {
             StateDrawer ghost = SelectedState.GetGhost();
-            RhythmToolStateMoveAction newChange = new RhythmToolStateMoveAction(SelectedState, SelectedState.OwningTimeline, ghost.OwningTimeline, SelectedState.Beat, ghost.Beat);
+            RhythmToolStateMoveAction newChange = new RhythmToolStateMoveAction(SelectedState, SelectedState.OwningTimeline, ghost.OwningTimeline, SelectedState.Beat, ghost.Beat, SelectedState.LengthInBeats, ghost.LengthInBeats);
             _editor.RecordChange(newChange);
         }
 

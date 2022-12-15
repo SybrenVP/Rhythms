@@ -30,5 +30,15 @@ namespace Rhythms
         {
             throw new System.NotImplementedException();
         }
+
+        public override void OnTimelineActivate()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void OnTimelineDisable()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
