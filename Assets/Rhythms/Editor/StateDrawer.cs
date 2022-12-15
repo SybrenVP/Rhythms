@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
-namespace Rhythms_Editor
+namespace RhythmEditor
 {
     public class StateDrawer
     {
@@ -25,6 +26,9 @@ namespace Rhythms_Editor
         private Color _backgroundColor = Color.black;
         private Color _shadowColor = Color.grey;
 
+        private Dictionary<int, Dictionary<string, ConnectionNode>> _outputConnectionNodes = new Dictionary<int, Dictionary<string, ConnectionNode>>();
+        private Dictionary<int, Dictionary<string, ConnectionNode>> _inputConnectionNodes = new Dictionary<int, Dictionary<string, ConnectionNode>>();
+
         public StateDrawer(Rhythm.State state, int beat, TrackTimeline owner, RhythmSequenceEditor editor)
         {
             State = state;
@@ -38,28 +42,6 @@ namespace Rhythms_Editor
             SetView();
         }
 
-        //Keeping this here for future reference, for now this has been disabled since we moved the moving functionality to the editor itself
-        
-        //public void Update(ref bool refresh)
-        //{
-        //    if (IsMoving && OwningTimeline.GetLeftAutoScrollRect().Contains(_mousePos))
-        //    {
-        //        // Scroll left
-        //        OwningTimeline.ScrollLeft();
-        //        _refresh = true;
-        //    }
-        //
-        //    if (IsMoving && OwningTimeline.GetRightAutoScrollRect().Contains(_mousePos))
-        //    {
-        //        //Scroll right
-        //        OwningTimeline.ScrollRight();
-        //        _refresh = true;
-        //    }
-        //
-        //    if (_refresh)
-        //        refresh = true;
-        //}
-
         public void OnGUI()
         {
             SetView();
@@ -71,8 +53,45 @@ namespace Rhythms_Editor
 
             //GUILayout.Label(State.Actions.Count.ToString());
             GUILayout.Label(State.LengthInBeats.ToString());
-
             GUILayout.EndArea();
+
+            for(int i = 0; i < State.Actions.Count; i++)
+            {
+                //Create serializedObject and prepare for drawing the inspectors
+                var so = new SerializedObject(State.Actions[i]);
+                so.Update();
+
+                SerializedProperty it = so.GetIterator();
+                it.NextVisible(true);
+
+                while (it.NextVisible(false))
+                {
+                    Rhythm.OutputAttribute outputAttribute = it.GetAttributes<Rhythm.OutputAttribute>();
+                    if (outputAttribute != null)
+                    {
+                        if (!_outputConnectionNodes.ContainsKey(i))
+                            _outputConnectionNodes.Add(i, new Dictionary<string, ConnectionNode>());
+
+                        if (!_outputConnectionNodes[i].ContainsKey(it.propertyPath))
+                            _outputConnectionNodes[i].Add(it.propertyPath, new ConnectionNode(this, EConnectionType.Output));
+
+                        _outputConnectionNodes[i][it.propertyPath].Draw();
+                    }
+
+                    Rhythm.InputAttribute inputAttribute = it.GetAttributes<Rhythm.InputAttribute>();
+                    if (inputAttribute != null)
+                    {
+                        if (!_inputConnectionNodes.ContainsKey(i))
+                            _inputConnectionNodes.Add(i, new Dictionary<string, ConnectionNode>());
+
+                        if (!_inputConnectionNodes[i].ContainsKey(it.propertyPath))
+                            _inputConnectionNodes[i].Add(it.propertyPath, new ConnectionNode(this, EConnectionType.Input));
+
+                        _inputConnectionNodes[i][it.propertyPath].Draw();
+                    }
+                }
+            }
+
         }
 
         public void OnGhostGUI()

@@ -14,6 +14,7 @@ namespace Rhythm
 
         //Has multiple tracks, tracks contain rhythm states
         public List<Track> Tracks = new List<Track>();
+        public List<DataConnection> DataConnections = new List<DataConnection>();
 
         public SequenceVariables Variables;
 

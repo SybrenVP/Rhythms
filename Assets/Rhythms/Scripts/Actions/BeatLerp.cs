@@ -6,6 +6,7 @@ namespace Rhythm
     //Example action
     public class BeatLerp : Action
     {
+        [Input]
         public R_Bool UseStateLength = new R_Bool(true);
 
         [Tooltip("Length in beats")]

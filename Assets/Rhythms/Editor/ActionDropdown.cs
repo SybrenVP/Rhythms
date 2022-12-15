@@ -22,7 +22,7 @@ public class ActionDropdown : AdvancedDropdown
     {
         var root = new AdvancedDropdownItem("Action");
 
-        List<System.Type> actions = Rhythms_Editor.Utility.GetAllSubclassesOf(typeof(Rhythm.Action));
+        List<System.Type> actions = RhythmEditor.Utility.GetAllSubclassesOf(typeof(Rhythm.Action));
 
         foreach (System.Type type in actions)
         {

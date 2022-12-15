@@ -9,7 +9,7 @@ public class RhythmBeatDragBox
     //Uses a call back whenever the beat on the drag box changed
 
     private int _beat = 0;
-    private Rhythms_Editor.TrackTimeline _owningTimeline = null;
+    private RhythmEditor.TrackTimeline _owningTimeline = null;
 
     private Vector2 _size;
     private Rect _view;
@@ -18,7 +18,7 @@ public class RhythmBeatDragBox
 
     private bool _dragActive = false;
 
-    public static RhythmBeatDragBox Create(int beat, Rhythms_Editor.TrackTimeline owningTimeline, Vector2 size, UnityAction<int, int> onBeatChanged, UnityAction onBeatApplied)
+    public static RhythmBeatDragBox Create(int beat, RhythmEditor.TrackTimeline owningTimeline, Vector2 size, UnityAction<int, int> onBeatChanged, UnityAction onBeatApplied)
     {
         RhythmBeatDragBox newBox = new RhythmBeatDragBox();
         newBox._beat = beat;

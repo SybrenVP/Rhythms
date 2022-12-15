@@ -8,6 +8,9 @@ namespace Rhythm
     {
         public KeyCode InputKey = KeyCode.Space;
 
+        [Output]
+        public R_Bool Result = new R_Bool(false);
+
         public override void OnTimelineActivate()
         {
             //Listen to the input manager

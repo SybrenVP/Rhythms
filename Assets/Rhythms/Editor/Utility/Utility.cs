@@ -4,8 +4,9 @@ using UnityEngine;
 using UnityEditor;
 using System.Reflection;
 using System.Linq;
+using System;
 
-namespace Rhythms_Editor
+namespace RhythmEditor
 {
     public struct Inset
     {
@@ -204,6 +205,29 @@ namespace Rhythms_Editor
             }
 
             return result;
+        }
+
+        public static TAttribute GetAttributes<TAttribute>(this SerializedProperty prop) where TAttribute : Attribute
+        {
+            if (prop == null)
+                return null;
+
+            Type propType = prop.serializedObject.targetObject.GetType();
+            if (propType == null)
+                return null;
+
+            foreach (string pathSegment in prop.propertyPath.Split('.'))
+            {
+                FieldInfo fieldInfo = propType.GetField(pathSegment, (BindingFlags)(-1));
+                if (fieldInfo != null)
+                    return fieldInfo.GetCustomAttribute<TAttribute>(false);
+
+                PropertyInfo propInfo = propType.GetProperty(pathSegment, (BindingFlags)(-1));
+                if (propInfo != null)
+                    return propInfo.GetCustomAttribute<TAttribute>(false);
+            }
+
+            return null;
         }
     }
 }

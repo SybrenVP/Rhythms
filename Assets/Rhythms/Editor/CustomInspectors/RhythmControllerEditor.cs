@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace Rhythms_Editor
+namespace RhythmEditor
 {
     /// <summary>
     /// Adds some visual information in the Unity inspector, useful for designers / debugging

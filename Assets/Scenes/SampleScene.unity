@@ -164,9 +164,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ActiveOnStart: 0
   States:
-    keys: 0e000000
+    keys: 0f00000026000000
     values:
     - {fileID: 1962327352}
+    - {fileID: 1302703852}
+  Active: 1
+--- !u!114 &442422994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 553a7cc127d68ec489bf2d03e684ef11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ActiveOnStart: 0
+  States:
+    keys: 1c000000
+    values:
+    - {fileID: 1550777516}
   Active: 1
 --- !u!114 &451004162
 MonoBehaviour:
@@ -183,7 +202,7 @@ MonoBehaviour:
   Type: 0
   ChangingName: 0
   TempName: ThisIsABool
-  EditingValue: 1
+  EditingValue: 0
   Value: 1
 --- !u!114 &473302557
 MonoBehaviour:
@@ -201,7 +220,8 @@ MonoBehaviour:
   Audio: {fileID: 1596850211}
   Tracks:
   - {fileID: 405770396}
-  - {fileID: 1136724057}
+  - {fileID: 442422994}
+  DataConnections: []
   Variables: {fileID: 1436749360}
 --- !u!114 &512254632
 MonoBehaviour:
@@ -398,6 +418,12 @@ MonoBehaviour:
   Enabled: 1
   Foldout: 1
   InputKey: 32
+  Result:
+    Name: New Variable
+    UseConstant: 0
+    Variable: {fileID: 0}
+    Constant: 0
+    Type: 0
 --- !u!114 &935518846
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -596,23 +622,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Values: []
---- !u!114 &1136724057
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 553a7cc127d68ec489bf2d03e684ef11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ActiveOnStart: 0
-  States:
-    keys: 
-    values: []
-  Active: 1
 --- !u!114 &1204996307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -626,6 +635,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Values: []
+--- !u!114 &1302703852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f5a74b4b11bbc549a8adbf4ba5d6350, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Actions: []
+  Active: 0
+  LengthInBeats: 1
 --- !u!114 &1436749360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -648,6 +672,21 @@ MonoBehaviour:
   - {fileID: 1204996307}
   - {fileID: 1023315650}
   - {fileID: 1081879043}
+--- !u!114 &1550777516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f5a74b4b11bbc549a8adbf4ba5d6350, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Actions: []
+  Active: 0
+  LengthInBeats: 1
 --- !u!114 &1596850211
 MonoBehaviour:
   m_ObjectHideFlags: 0

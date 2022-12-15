@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 
-namespace Rhythms_Editor
+namespace RhythmEditor
 {
     /// <summary>
     /// The main power source of the rhythms engine. This is the editor window for the rhythm editor, combines the timeline views with inspector and toolbars. 

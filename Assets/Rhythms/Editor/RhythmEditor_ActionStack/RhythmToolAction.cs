@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Rhythms_Editor
+namespace RhythmEditor
 {
 
     public abstract class RhythmToolAction

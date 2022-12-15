@@ -8,7 +8,7 @@ namespace Rhythm
     /// <summary>
     /// This class is a wrapper for custom actions to be able to use 2 different types of variables. 
     /// 1. Just a value, this value is not saved in a scriptable object. 
-    /// 2. A scriptable object, this value will be saved an can be used by later actions to adjust behaviour during a sequence
+    /// 2. A scriptable object, this value will be saved and can be used by later actions to adjust behaviour during a sequence
     /// </summary>
     [System.Serializable]
     public class R_Variable

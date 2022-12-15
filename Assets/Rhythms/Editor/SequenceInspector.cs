@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace Rhythms_Editor
+namespace RhythmEditor
 {
     public class SequenceInspector
     {

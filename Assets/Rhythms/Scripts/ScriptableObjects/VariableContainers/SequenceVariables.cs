@@ -66,7 +66,7 @@ namespace Rhythm
             return Variables[(int)type].Count();
         }
 
-        public R_VariableSO CreateNewVariable(VariableType type)
+        public R_VariableSO CreateNewVariable(VariableType type) //TODO: Rework this method to generate 'hidden' variables 
         {
             Init();
 
