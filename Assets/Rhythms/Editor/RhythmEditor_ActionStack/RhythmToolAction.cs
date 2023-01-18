@@ -16,8 +16,8 @@ namespace RhythmEditor
     {
         private StateDrawer _affectedState;
 
-        private TrackTimeline _oldTimeline;
-        private TrackTimeline _newTimeline;
+        private TrackGUI _oldTimeline;
+        private TrackGUI _newTimeline;
 
         private int _oldLength;
         private int _newLength;
@@ -25,7 +25,7 @@ namespace RhythmEditor
         private int _oldBeat;
         private int _newBeat;
 
-        public RhythmToolStateMoveAction(StateDrawer state, TrackTimeline oldTrack, TrackTimeline newTrack, int oldBeat, int newBeat, int oldLength, int newLength)
+        public RhythmToolStateMoveAction(StateDrawer state, TrackGUI oldTrack, TrackGUI newTrack, int oldBeat, int newBeat, int oldLength, int newLength)
         {
             _affectedState = state;
 
@@ -44,7 +44,7 @@ namespace RhythmEditor
             if (_oldTimeline != _newTimeline)
             {
                 _oldTimeline.RemoveState(_oldBeat);
-                _affectedState.OwningTimeline = _newTimeline;
+                _affectedState.TrackGUI = _newTimeline;
                 _newTimeline.AcceptState(_affectedState);
             }
 
@@ -53,7 +53,7 @@ namespace RhythmEditor
             _affectedState.State.LengthInBeats = _newLength;
             _newTimeline.MoveStateTo(_affectedState.State, _newBeat);
 
-            _affectedState.SetView();
+            _newTimeline.RefreshStatePositionAndSize(_affectedState, _newBeat, _newLength);
         }
 
         public override void Revert()
@@ -61,7 +61,7 @@ namespace RhythmEditor
             if (_newTimeline != _oldTimeline)
             {
                 _newTimeline.RemoveState(_newBeat);
-                _affectedState.OwningTimeline = _oldTimeline;
+                _affectedState.TrackGUI = _oldTimeline;
                 _oldTimeline.AcceptState(_affectedState);
             }
 
@@ -70,7 +70,7 @@ namespace RhythmEditor
             _affectedState.State.LengthInBeats = _oldLength;
             _oldTimeline.MoveStateTo(_affectedState.State, _oldBeat);
 
-            _affectedState.SetView();
+            _newTimeline.RefreshStatePositionAndSize(_affectedState, _oldBeat, _oldLength);
         }
     }
 }

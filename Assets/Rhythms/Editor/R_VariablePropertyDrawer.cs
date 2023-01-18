@@ -78,7 +78,10 @@ public abstract class R_VariablePropertyDrawer : PropertyDrawer
         foreach (Rhythm.R_VariableSO variable in seq.Variables)
         {
             if (variable == null)
+            {
+                Debug.Log("found a null variable in the sequence.Variables");
                 continue;
+            }
 
             if (IsType(variable))
                 result.Add(variable);
@@ -99,8 +102,10 @@ public abstract class R_VariablePropertyDrawer : PropertyDrawer
     
         foreach (Rhythm.R_VariableSO var in vars)
         {
-            if (var == null)
+            if (var == null) //The first entry is null
+            {
                 continue;
+            }
 
             result.Add(var.name);
         }

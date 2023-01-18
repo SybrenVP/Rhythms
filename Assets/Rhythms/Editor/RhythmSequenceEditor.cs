@@ -17,11 +17,7 @@ namespace RhythmEditor
 
         #region Timelines
 
-        public List<TrackTimeline> Timelines = new List<TrackTimeline>();
-
-        public Vector2 ScrollPosition_Timelines = Vector2.zero;
-        public Rect Rect_TimelinesEditorView;
-        public Rect Rect_TimelinesEditorFull;
+        public TimelineGUI Timeline = null;
 
         #endregion
 
@@ -57,7 +53,7 @@ namespace RhythmEditor
         {
             var editorWindow = GetWindow<RhythmSequenceEditor>("Rhythms");
 
-            editorWindow.minSize = new Vector2(TrackTimeline.MINWIDTH + SequenceInspector.MINWIDTH, TrackTimeline.MINHEIGHT);
+            editorWindow.minSize = new Vector2(TrackGUI.MINWIDTH + SequenceInspector.MINWIDTH, TrackGUI.MINHEIGHT);
             editorWindow.wantsMouseMove = true;
 
             return editorWindow;
@@ -68,81 +64,25 @@ namespace RhythmEditor
             ActiveSequence = sequence;
             _controller = controller;
 
-            Timelines.Clear(); 
+            Timeline = null;
 
-            if (ActiveSequence == null)
+            if (ActiveSequence == null) 
                 ActiveSequence = ScriptableObject.CreateInstance<Rhythm.Sequence>();
 
             Rect_EditorWindow = new Rect(Vector2.zero, position.size);
 
             InitializeToolbar();
 
-            InitializeTrackTimelines();
+            Timeline = new TimelineGUI();
+            Timeline.Initialize(ActiveSequence, this, new Rect(0f, Tools.View.height, position.width - SequenceInspector.MINWIDTH, position.height - Tools.View.height));
 
             InitializeSequenceInspector();
 
             InitializeInputController();
 
             InitializeActionStack();
-        }
 
-        private void InitializeTrackTimelines()
-        {
-            Vector2 size = DefineWidthHeightOfTimeline();
-
-            //We differentiate between Full and View. Full is the entire object, View is the portion visible by the scroll rect
-            Rect_TimelinesEditorFull = new Rect(Vector2.zero, new Vector2(size.x, size.y * ActiveSequence.Tracks.Count));
-            Rect_TimelinesEditorView = new Rect(Vector2.zero, new Vector2(Rect_TimelinesEditorFull.width, position.height));
-            Rect_TimelinesEditorView.y = EditorGUIUtility.singleLineHeight;
-
-            for (int i = 0; i < ActiveSequence.Tracks.Count; i++)
-            {
-                if (ActiveSequence.Tracks[i] == null)
-                {
-                    Debug.LogWarning("Corrupt sequence, destroying tracks :("); //Temporary null catch, this will only be called if serialization is failing
-                    ActiveSequence.Tracks.Clear();
-                    Timelines.Clear();
-
-                    return;
-                }
-
-                Color trackBackground = i % 2 == 1 ? new Color(0.30f, 0.30f, 0.30f, 1f) : new Color(0.20f, 0.20f, 0.20f, 1f);
-
-                CreateTimeline(size.y, size.x, ActiveSequence.Tracks[i]);
-            }
-        }
-
-        private Vector2 DefineWidthHeightOfTimeline()
-        {
-            Vector2 size = Vector2.zero;
-
-            size.x = position.width - (Inspector != null ? Inspector.View.width : SequenceInspector.MINWIDTH);
-            size.y = position.height / ActiveSequence.Tracks.Count;
-            size.y = Mathf.Max(size.y, TrackTimeline.MINHEIGHT);
-
-            return size;
-        }
-
-        private void CreateTimeline(float height, float width, Rhythm.Track track)
-        {
-            Color trackBackground = Timelines.Count % 2 == 1 ? new Color(0.30f, 0.30f, 0.30f, 1f) : new Color(0.20f, 0.20f, 0.20f, 1f);
-
-            Timelines.Add(new TrackTimeline(track, ActiveSequence.Audio, this, new Rect(0f, height * Timelines.Count, width, height), trackBackground));
-        }
-
-        private void UpdateTimelines()
-        {
-            Vector2 size = DefineWidthHeightOfTimeline();
-
-            for (int i = 0; i < ActiveSequence.Tracks.Count; i++)
-            {
-                Color trackBackground = i % 2 == 1 ? new Color(0.30f, 0.30f, 0.30f, 1f) : new Color(0.20f, 0.20f, 0.20f, 1f);
-
-                Timelines[i].SetView(size, i);
-                Timelines[i].SetBackground(trackBackground);
-            }
-
-            Rect_TimelinesEditorFull = new Rect(Vector2.zero, new Vector2(size.x, size.y * ActiveSequence.Tracks.Count));
+            InitializeDataConnections();
         }
 
         private void InitializeSequenceInspector()
@@ -150,13 +90,13 @@ namespace RhythmEditor
             float inspectorWidth = SequenceInspector.MINWIDTH;
 
             Inspector = new SequenceInspector(ActiveSequence, this);
-            Inspector.View = new Rect(Rect_TimelinesEditorView.width, Tools.View.height, inspectorWidth, position.height - Tools.View.height);
+            Inspector.View = new Rect(Timeline.View.width, Tools.View.height, inspectorWidth, position.height - Tools.View.height);
         }
 
         private void InitializeToolbar()
         {
             Tools = new Toolbar(this);
-            Tools.View = new Rect(position.x, 0f, position.width, EditorGUIUtility.singleLineHeight + Toolbar.BUTTON_VERTICAL_OFFSET * 2f);
+            Tools.View = new Rect(0f, 0f, position.width, EditorGUIUtility.singleLineHeight + Toolbar.BUTTON_VERTICAL_OFFSET * 2f);
         }
 
         private void InitializeInputController()
@@ -170,9 +110,38 @@ namespace RhythmEditor
             _actionStack = new EditorActionStack();
         }
 
+        private void InitializeDataConnections()
+        {
+            //TODO: Loop through the data connections, search for a state in which one of the actions has a variable equal to the output and input variable. Set the connection node, connected node to the correct value
+            foreach (DataConnection connection in ActiveSequence.DataConnections)
+            {
+                foreach (Rhythm.Track track in ActiveSequence.Tracks)
+                {
+                    foreach (KeyValuePair<int, Rhythm.State> state in track.States)
+                    {
+                        foreach (Rhythm.Action action in state.Value.Actions)
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
+
         protected void OnEnable()
         {
-            var controller = Selection.activeGameObject.GetComponent<Rhythm.RhythmController>();
+            Rhythm.RhythmController controller = null;
+            if (Selection.activeGameObject != null)
+            {
+                controller = Selection.activeGameObject.GetComponent<Rhythm.RhythmController>();
+                if (controller == _controller)
+                    return;
+            }
+            else
+            {
+                controller = _controller;
+            }
+
             if (controller)
             {
                 OpenSequenceFromController(controller, controller.ActiveSequence);
@@ -183,6 +152,7 @@ namespace RhythmEditor
                 Close();
             }
 
+            Debug.Log("data connections: " + ActiveSequence.DataConnections.Count);
         }
 
         private void LoadSequence()
@@ -200,11 +170,6 @@ namespace RhythmEditor
         protected void OnDisable()
         {
             SaveSequence();
-
-            foreach (TrackTimeline timeline in Timelines)
-            {
-                timeline.Destroy();
-            }
 
             EditorApplication.update -= OnTryRepaint;
         }
@@ -233,29 +198,8 @@ namespace RhythmEditor
             if (!ActiveSequence)
                 return;
 
-            #region Timelines
-
-            ScrollPosition_Timelines = GUI.BeginScrollView(Rect_TimelinesEditorView, ScrollPosition_Timelines, Rect_TimelinesEditorFull, false, true, GUIStyle.none, GUI.skin.verticalScrollbar);
-
-            foreach (TrackTimeline timeline in Timelines)
-            { 
-                timeline.OnGUI();
-            }
-
-            //Draw states on the timeline here
-            foreach (TrackTimeline timeline in Timelines)
-            {
-                timeline.OnStateGUI();
-            }
-
-            foreach (TrackTimeline timeline in Timelines)
-            {
-                timeline.OnStateGhostGUI();
-            }
-
-            GUI.EndScrollView(true);
-
-            #endregion
+            Timeline.OnGUI();
+            Timeline.HandleInput();
 
             #region Inspector
 
@@ -267,44 +211,6 @@ namespace RhythmEditor
 
             _inputController.Update();
         }
-
-        #region Timeline Control
-
-        public void AddTrack()
-        {
-            Rhythm.Track newTrack = ScriptableObject.CreateInstance<Rhythm.Track>();
-            ActiveSequence.Tracks.Add(newTrack);
-
-            SaveSequence();
-
-            Vector2 size = DefineWidthHeightOfTimeline();
-            CreateTimeline(size.y, size.x, newTrack);
-
-            UpdateTimelines();
-        }
-
-        public void RemoveTrack(object track)
-        {
-            int trackIndex = ActiveSequence.Tracks.IndexOf((Rhythm.Track)track);
-            if (trackIndex < 0)
-            {
-                Debug.LogWarning("Found a track that is not present in the Created Tracks. Clearing all corrupted data."); //Temporary null catch, this will only be called if serialization is failing
-                ActiveSequence.Tracks.Clear();
-                Timelines.Clear();
-            }
-            else
-            {
-                ActiveSequence.Tracks.RemoveAt(trackIndex);
-                Timelines.RemoveAt(trackIndex);
-            }
-
-            SaveSequence();
-
-            UpdateTimelines();
-        }
-
-
-        #endregion
 
         #region Undo/Redo
 
@@ -335,11 +241,26 @@ namespace RhythmEditor
 
         #endregion
 
+        #region DataConnections
+
+        public void CreateDataConnection()
+        {
+
+        }
+
+        public void DestroyDataConnection()
+        {
+
+        }
+
+        #endregion
+
         public void SaveSequence()
         {
             if (_controller) //Meaning we opened this from a controller (only this is supported at this time, in the future I also want to add scriptable object support from the assets folder)
             {
                 _controller.ActiveSequence = ActiveSequence;
+                EditorUtility.SetDirty(ActiveSequence);
                 EditorUtility.SetDirty(_controller);
                 EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
             }

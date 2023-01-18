@@ -14,44 +14,22 @@ namespace Rhythm
         //If the length is 0, it will only play Start
         public int LengthInBeats = 1;
 
-        public void OnTimelineActivate()
+        public void StartState(int beat, AudioData data)
         {
             foreach (Action action in Actions)
             {
                 if (action.Enabled)
-                    action.OnTimelineActivate();
-            }
-        }
+                {
+                    action.SetAudioData(data);
+                    action.SetStateInformation(beat, LengthInBeats);
 
-        public void OnTimelineDisable()
-        {
-            foreach (Action action in Actions)
-            {
-                if (action.Enabled)
-                    action.OnTimelineDisable();
-            }
-        }
-
-        public void Start()
-        {
-            foreach (Action action in Actions)
-            {
-                if (action.Enabled)
                     action.Start();
+                }
             }
         }
 
         public void OnBeatUpdate()
         {
-            if (!Active)
-            {
-                Start();
-                if (LengthInBeats == 0)
-                    return;
-
-                Active = true;
-            }
-
             if (Active)
             {
                 foreach (Action action in Actions)
@@ -62,8 +40,17 @@ namespace Rhythm
             }
         }
 
-        public void OnUpdate()
+        public void OnUpdate(int currentBeat, AudioData data)
         {
+            if (!Active)
+            {
+                StartState(currentBeat, data);
+                if (LengthInBeats == 0)
+                    return;
+
+                Active = true;
+            }
+
             if (Active)
             {
                 foreach (Action action in Actions)

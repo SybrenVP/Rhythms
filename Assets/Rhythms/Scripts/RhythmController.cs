@@ -45,7 +45,6 @@ namespace Rhythm
         {
             _startTime = Time.time;
             _activeSource.Play();
-            ActiveSequence.Start();
         }
 
         public void Update()
@@ -53,7 +52,7 @@ namespace Rhythm
             if (_activeSource.isPlaying)
             {
                 _songPositionInSeconds = Time.time - _startTime - _activeAudio.SongOffset;
-                _songPositionInBeats = _songPositionInSeconds / _activeAudio.SecPerBeat;
+                _songPositionInBeats = (_songPositionInSeconds / _activeAudio.SecPerBeat) - 0.5f;
 
                 _currentBeatNumber = (int)_songPositionInBeats;
 
@@ -69,12 +68,14 @@ namespace Rhythm
 
         public void UpdateSequence()
         {
+            float beatOffset = _songPositionInBeats - _currentBeatNumber;
+
+            ActiveSequence.OnUpdate(_currentBeatNumber, beatOffset);
+
             if (_previousBeat < _currentBeatNumber)
             {
                 ActiveSequence.OnBeatUpdate(_currentBeatNumber);
             }
-
-            ActiveSequence.OnUpdate(_currentBeatNumber);
         }
     }
 }

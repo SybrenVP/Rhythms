@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using Rhythm;
 
 namespace RhythmEditor
 {
@@ -29,8 +30,10 @@ namespace RhythmEditor
             using (new GUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 using (new GUILayout.HorizontalScope())
-                {
+                {                    
                     controller.ActiveSequence.Name = EditorGUILayout.TextField(controller.ActiveSequence.Name);
+
+                    controller.ActiveSequence.Audio = (AudioData)EditorGUILayout.ObjectField(controller.ActiveSequence.Audio, typeof(AudioData), false);
 
                     if (GUILayout.Button("Edit", GUILayout.Width(60f)))
                     {

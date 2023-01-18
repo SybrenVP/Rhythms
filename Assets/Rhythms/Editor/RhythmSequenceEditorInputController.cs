@@ -25,7 +25,7 @@ namespace RhythmEditor
         // Select -> Selected, ControlTimeline -> ControllingTimeline, Move -> Moving, Resize -> Resizing
         private bool _inputStateActive = false;
 
-        private TrackTimeline _inputOwningTimeline = null;
+        private TrackGUI _inputOwningTimeline = null;
         private Vector2 _lastMousePos = Vector2.zero;
         private float _offsetToMousePos = 0f;
 
@@ -140,18 +140,18 @@ namespace RhythmEditor
             if (e.button == 0) //Left Mouse Button
             {
                 //Via the timeline we can find the correct state
-                _inputOwningTimeline = TrackTimeline.FindOwningTimeline(_editor, e.mousePosition);
+                _inputOwningTimeline = TimelineGUI.FindOwningTrackGUI(_editor.Timeline, e.mousePosition);
 
-                int beat = _inputOwningTimeline.GetBeatForPosition(e.mousePosition);
+                int beat = _editor.Timeline.GetBeatForPosition(e.mousePosition);
 
                 StateDrawer stateDrawer = _inputOwningTimeline.GetStateForBeat(beat);
 
-                if (stateDrawer != null && stateDrawer.View.Contains(e.mousePosition)) //We selected a state
+                if (stateDrawer != null) //We selected a state
                 {
                     _inputStateActive = true; //We are now in the active state 
 
                     //We need to keep track of the offset between mouse position and selected state, so we can keep the state at the same offset when moving it around
-                    _offsetToMousePos = _inputOwningTimeline.GetXForBeat(beat) - _inputOwningTimeline.GetXForBeat(stateDrawer.Beat);
+                    _offsetToMousePos = _editor.Timeline.GetPositionForBeat(beat) - _editor.Timeline.GetPositionForBeat(stateDrawer.Beat);
 
                     GUIUtility.hotControl = _controlId;
 
@@ -197,7 +197,7 @@ namespace RhythmEditor
 
                 case EventType.MouseDrag:
 
-                    HandleMouseDragTimeline(e);
+                    //HandleMouseDragTimeline(e);
 
                     break;
             }
@@ -209,7 +209,7 @@ namespace RhythmEditor
             {
                 if (!_inputStateActive)
                 {
-                    _inputOwningTimeline = TrackTimeline.FindOwningTimeline(_editor, e.mousePosition);
+                    _inputOwningTimeline = TimelineGUI.FindOwningTrackGUI(_editor.Timeline, e.mousePosition);
                     _inputStateActive = true;
 
                     _lastMousePos = e.mousePosition;
@@ -230,21 +230,6 @@ namespace RhythmEditor
 
             GUIUtility.hotControl = 0;
             e.Use();
-        }
-
-        private void HandleMouseDragTimeline(Event e)
-        {
-            if (e.button == 0)
-            {
-                if (_inputStateActive)
-                {
-                    Vector2 diff = e.mousePosition - _lastMousePos;
-                    _inputOwningTimeline.Scroll(-diff.x);
-
-                    _lastMousePos = e.mousePosition;
-                    _editor.Refresh();
-                }
-            }
         }
 
         #endregion
@@ -293,7 +278,7 @@ namespace RhythmEditor
         private void RecordGhost()
         {
             StateDrawer ghost = SelectedState.GetGhost();
-            RhythmToolStateMoveAction newChange = new RhythmToolStateMoveAction(SelectedState, SelectedState.OwningTimeline, ghost.OwningTimeline, SelectedState.Beat, ghost.Beat, SelectedState.LengthInBeats, ghost.LengthInBeats);
+            RhythmToolStateMoveAction newChange = new RhythmToolStateMoveAction(SelectedState, SelectedState.TrackGUI, ghost.TrackGUI, SelectedState.Beat, ghost.Beat, SelectedState.LengthInBeats, ghost.LengthInBeats);
             _editor.RecordChange(newChange);
         }
 
@@ -302,12 +287,12 @@ namespace RhythmEditor
             if (e.button == 0)
             {
                 //Move to another timeline
-                TrackTimeline newTimeline = TrackTimeline.FindOwningTimeline(_editor, e.mousePosition);
+                TrackGUI newTimeline = TimelineGUI.FindOwningTrackGUI(_editor.Timeline, e.mousePosition);
 
                 if (newTimeline != null)
                     _inputOwningTimeline = newTimeline;
 
-                int ghostBeat = _inputOwningTimeline.GetBeatForPosition(new Vector2(e.mousePosition.x - _offsetToMousePos, e.mousePosition.y));
+                int ghostBeat = _editor.Timeline.GetBeatForPosition(new Vector2(e.mousePosition.x - _offsetToMousePos, e.mousePosition.y));
                 SelectedState.MoveGhost(newTimeline, ghostBeat);
 
                 _editor.Refresh();

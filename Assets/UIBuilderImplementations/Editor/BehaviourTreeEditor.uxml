@@ -1,0 +1,31 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/UIBuilderImplementations/Editor/BehaviourTreeEditor.uss?fileID=7433441132597879392&amp;guid=6891bd9f90cc50f4594d9ebad5843d99&amp;type=3#BehaviourTreeEditor" />
+    <uie:Toolbar>
+        <uie:ToolbarMenu display-tooltip-when-elided="true" text="Assets" />
+    </uie:Toolbar>
+    <SplitView fixed-pane-initial-dimension="150" orientation="Vertical">
+        <ui:VisualElement name="Top-panel">
+            <ui:VisualElement name="trackView" style="flex-grow: 1; position: relative;">
+                <ui:Label text="TrackView" display-tooltip-when-elided="true" style="background-color: rgb(37, 37, 37);" />
+                <TrackView name="TrackView" style="flex-grow: 1; flex-direction: column; background-color: rgb(41, 41, 41);">
+                    <ui:ScrollView style="flex-grow: 1;">
+                        <ui:VisualElement name="scrollview-content" style="flex-grow: 1;" />
+                        <ui:IMGUIContainer style="background-color: rgb(55, 55, 55); left: 0; top: 0; right: 100%; bottom: 20%; flex-grow: 0; width: 100%; height: 24px; border-left-color: rgb(35, 35, 35); border-right-color: rgb(35, 35, 35); border-top-color: rgb(35, 35, 35); border-bottom-color: rgb(35, 35, 35); border-bottom-width: 3px;" />
+                    </ui:ScrollView>
+                </TrackView>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="Bottom-panel">
+            <SplitView orientation="Horizontal" fixed-pane-initial-dimension="350">
+                <ui:VisualElement name="inspector-container">
+                    <ui:Label text="Inspector" display-tooltip-when-elided="true" style="background-color: rgb(37, 37, 37);" />
+                    <InspectorView style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="treeView" style="flex-grow: 1;">
+                    <ui:Label text="TreeView" display-tooltip-when-elided="true" style="background-color: rgb(37, 37, 37);" />
+                    <BehaviourTreeView focusable="true" style="flex-grow: 1;" />
+                </ui:VisualElement>
+            </SplitView>
+        </ui:VisualElement>
+    </SplitView>
+</ui:UXML>

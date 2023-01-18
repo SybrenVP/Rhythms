@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Newtonsoft.Json.Linq;
 
 namespace Rhythm
 {
@@ -18,11 +19,11 @@ namespace Rhythm
         public bool UseConstant = false;
 
         public object Constant;
-        public R_VariableSO Variable;
+        public object Variable;
 
-        public object RawObjectValue { get { return UseConstant ? Constant : Variable.Value; } }
+        public object RawObjectValue { get { return default; } }
 
-        public object Value { get { return UseConstant ? Constant : Variable.Value; } }
+        public object Value { get { return default; } }
 
         public VariableType Type
         {
@@ -39,6 +40,9 @@ namespace Rhythm
         {
             Constant = value;
         }
+
+        public delegate void ValueChangeEvent(object newValue);
+        public ValueChangeEvent OnChange;
     }
 
     #endregion
@@ -46,9 +50,11 @@ namespace Rhythm
     #region Bool
 
     [System.Serializable]
-    public class R_Bool : R_Variable
+    public class R_Bool : R_Variable, ISerializationCallbackReceiver
     {
         public new bool Constant = false;
+        public new R_BoolSO Variable = null;
+
         public new bool Value
         {
             get
@@ -61,7 +67,23 @@ namespace Rhythm
                     Constant = value;
                 else
                     Variable.Value = value;
+
+                OnChange?.Invoke(value);
             }
+        }
+
+        public bool SerializableVariableValue;
+
+        public void OnBeforeSerialize()
+        {
+            if (Variable != null)
+                SerializableVariableValue = (bool)Variable.Value;
+        }
+
+        public void OnAfterDeserialize()
+        {
+            if (Variable != null)
+                Variable.Value = SerializableVariableValue;
         }
 
         public new VariableType Type = VariableType.Bool;
@@ -72,9 +94,10 @@ namespace Rhythm
             Type = VariableType.Bool;
         }
 
-        public R_Bool(bool value)
+        public R_Bool(bool value) : base(value)
         {
-            Constant = value;
+            UseConstant = true;
+            Value = value;
         }
     }
 
@@ -86,6 +109,8 @@ namespace Rhythm
     public class R_Float : R_Variable
     {
         public new float Constant = 0f;
+        public new R_FloatSO Variable = null;
+
         public new float Value
         {
             get
@@ -123,6 +148,8 @@ namespace Rhythm
     public class R_Int : R_Variable
     {
         public new int Constant = 0;
+        public new R_IntSO Variable = null;
+
         public new int Value
         {
             get
@@ -160,6 +187,8 @@ namespace Rhythm
     public class R_String : R_Variable
     {
         public new string Constant = "";
+        public new R_StringSO Variable = null;
+
         public new string Value
         {
             get
@@ -194,14 +223,16 @@ namespace Rhythm
     #region GameObject
 
     [System.Serializable]
-    public class R_GameObject : R_Variable
+    public class R_GameObject : R_Variable, ISerializationCallbackReceiver
     {
         public new GameObject Constant = null;
+        public new R_GameObjectSO Variable = null;
+
         public new GameObject Value
         {
             get
             {
-                return UseConstant ? (GameObject)Constant : (GameObject)Variable.Value;
+                return UseConstant ? Constant : Variable.Value;
             }
             set
             {
@@ -210,6 +241,20 @@ namespace Rhythm
                 else
                     Variable.Value = value;
             }
+        }
+
+        public GameObject SerializableVariableValue;
+
+        public void OnBeforeSerialize()
+        {
+            if (Variable != null)
+                SerializableVariableValue = (GameObject)Variable.Value;
+        }
+
+        public void OnAfterDeserialize()
+        {
+            if (Variable != null)
+                Variable.Value = SerializableVariableValue;
         }
 
         public new VariableType Type = VariableType.GameObject;
@@ -234,6 +279,8 @@ namespace Rhythm
     public class R_Vector2 : R_Variable
     {
         public new Vector2 Constant = Vector2.zero;
+        public new R_Vector2SO Variable = null;
+
         public new Vector2 Value
         {
             get
@@ -268,9 +315,11 @@ namespace Rhythm
     #region Vector3
 
     [System.Serializable]
-    public class R_Vector3 : R_Variable
+    public class R_Vector3 : R_Variable, ISerializationCallbackReceiver
     {
         public new Vector3 Constant = Vector3.zero;
+        public new R_Vector3SO Variable = null;
+
         public new Vector3 Value
         {
             get
@@ -284,6 +333,20 @@ namespace Rhythm
                 else
                     Variable.Value = value;
             }
+        }
+
+        public Vector3 SerializableVariableValue;
+
+        public void OnBeforeSerialize()
+        {
+            if (Variable != null)
+                SerializableVariableValue = (Vector3)Variable.Value;
+        }
+
+        public void OnAfterDeserialize()
+        {
+            if (Variable != null)
+                Variable.Value = SerializableVariableValue;
         }
 
         public new VariableType Type = VariableType.Vector3;
@@ -308,6 +371,8 @@ namespace Rhythm
     public class R_Color : R_Variable
     {
         public new Color Constant = Color.white;
+        public new R_ColorSO Variable = null;
+
         public new Color Value
         {
             get
@@ -345,6 +410,8 @@ namespace Rhythm
     public class R_Rect : R_Variable
     {
         public new Rect Constant = Rect.zero;
+        public new R_RectSO Variable = null;
+
         public new Rect Value
         {
             get

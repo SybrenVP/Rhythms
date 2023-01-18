@@ -11,48 +11,83 @@ namespace Rhythm
         [Output]
         public R_Bool Result = new R_Bool(false);
 
-        public override void OnTimelineActivate()
-        {
-            //Listen to the input manager
-            InputManager.Instance.ListenToKeyDown(InputKey, KeyDownEvent);
-            InputManager.Instance.ListenToKeyUp(InputKey, KeyUpEvent);
-        }
+        public R_Float InputOffset;
 
-        public override void OnTimelineDisable()
-        {
-            
-        }
+        private float _inputTime = -1f;
+        private float _beatTime = -1f;
 
         private void KeyDownEvent()
         {
-            Debug.Log("Key went down");
+            Result.Value = true;
+            _inputTime = Time.time;
 
-            //Check if it was within the beat range
+            if (_beatTime > 0f)
+            {
+                CalculateOffset();
+            }
         }
 
         private void KeyUpEvent()
         {
-            Debug.Log("Key went up");
         }
 
         public override void BeatUpdate()
         {
-            
+            _beatTime = Time.time;
+            if (_inputTime > 0f)
+            {
+                CalculateOffset();
+            }
         }
 
         public override void Exit()
         {
-            
+            if (_inputTime < 0f)
+            {
+                Debug.Log("Missed");
+                InputOffset.Value = -1f;
+            }
+
+            InputManager.Instance.RemoveKeyDown(InputKey, KeyDownEvent);
+            InputManager.Instance.RemoveKeyUp(InputKey, KeyUpEvent);
         }
 
         public override void Start()
         {
-            
+            InputManager.Instance.ListenToKeyDown(InputKey, KeyDownEvent);
+            InputManager.Instance.ListenToKeyUp(InputKey, KeyUpEvent);
         }
 
-        public override void Update()
+        public override void Update() 
         {
-            
+            if (Result.Value && _beatTime > 0f)
+            {
+                Enabled = false;
+                Exit();
+            }
+        }
+
+        private void CalculateOffset()
+        {
+            float offset = _inputTime - _beatTime;
+
+            if (offset > Mathf.Abs(_audioData.SecPerBeat))
+            {
+                InputOffset.Value = -1f;
+                Debug.Log("Missed");
+                return;
+            }
+
+            if (offset < -0.1f)
+                Debug.Log("Early");
+
+            if (offset > 0.1f)
+                Debug.Log("Late");
+
+            if (offset > -0.1f && offset < 0.1f)
+                Debug.Log("Perfect");
+
+            InputOffset.Value = offset;
         }
     }
 }

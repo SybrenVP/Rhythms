@@ -22,21 +22,18 @@ namespace Rhythm
         {
             if (!Audio)
                 Audio = CreateInstance<AudioData>();
-        }
 
-        public void Start()
-        {
-            foreach (Track track in Tracks)
+            foreach (DataConnection connection in DataConnections)
             {
-                track.Start();
+                connection.Start();
             }
         }
 
-        public void OnUpdate(int currentBeat)
+        public void OnUpdate(int currentBeat, float beatOffset)
         {
             foreach (Track track in Tracks)
             {
-                track.OnUpdate(currentBeat);
+                track.OnUpdate(currentBeat, beatOffset, Audio);
             }
         }
 
@@ -45,7 +42,7 @@ namespace Rhythm
             //We'll check if each active track has a state on the current beat (HasKey), if it does, call BeatUpdate on the state
             foreach (Track track in Tracks)
             {
-                track.OnUpdate(currentBeat);
+                track.OnBeatUpdate(currentBeat);
             }
         }
     }

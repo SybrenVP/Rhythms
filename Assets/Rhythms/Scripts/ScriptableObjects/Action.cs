@@ -16,11 +16,22 @@ namespace Rhythm
 
 #endif
 
-        public abstract void OnTimelineActivate();
-
-        public abstract void OnTimelineDisable();
+        protected AudioData _audioData;
+        protected int _beat;
+        protected int _lengthInBeats;
 
         public abstract void Start();
+
+        public void SetAudioData(AudioData data)
+        {
+            _audioData = data;
+        }
+
+        public void SetStateInformation(int beat, int length)
+        {
+            _beat = beat;
+            _lengthInBeats = length;
+        }
 
         public abstract void BeatUpdate();
 

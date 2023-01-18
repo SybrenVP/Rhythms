@@ -161,7 +161,7 @@ namespace RhythmEditor
             {
                 if (GUILayout.Button(_addTrackButtonContent, "ToolbarButton", GUILayout.Width(BUTTON_WIDTH)))
                 {
-                    _editor.AddTrack();
+                    _editor.Timeline.AddTrack();
                 }
             }
             EditorGUILayout.EndHorizontal();

@@ -1,97 +1,198 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using static UnityEditor.PlayerSettings;
+using UnityEditor.Graphs;
+using static UnityEngine.EventSystems.StandaloneInputModule;
 
 namespace RhythmEditor
 {
     public class StateDrawer
     {
-        public TrackTimeline OwningTimeline = null;
+        //Main editor window
+        private RhythmSequenceEditor _sequenceEditorWindow;
 
+        //Data
         public Rhythm.State State = null;
-        public int Beat = -1;
-        public int LengthInBeats = 1;
 
-        public Rect View;
-
-        private readonly float STATE_SIZE_PERCENTAGE = 0.75f;
-
+        //GUI owned by this class
         private RhythmBeatDragBox _box_1 = null;
         private RhythmBeatDragBox _box_2 = null;
 
         private StateDrawer _ghost = null;
 
-        private RhythmSequenceEditor _editor;
+        //Owner of this GUI
+        public TrackGUI TrackGUI = null;
+        private TimelineGUI _timelineGUI = null;
+
+        public int Beat = -1;
+        public int LengthInBeats = 1;
+
+        #region Variables :: Size
+
+        public Rect BaseRect;
+        public Rect View { get; private set; }
+
+        public Vector2 Size;
+        public Vector2 Position;
+
+        #endregion
+
+        #region Variables :: Consts
+
+        private readonly float STATE_SIZE_PERCENTAGE = 0.75f;
+        private readonly float STATE_MIN_HEIGHT = 50f;
+        private readonly float NODE_HEIGHT = 10f;
 
         private Color _backgroundColor = Color.black;
-        private Color _shadowColor = Color.grey;
+        private readonly Color _shadowColor = Color.grey;
 
-        private Dictionary<int, Dictionary<string, ConnectionNode>> _outputConnectionNodes = new Dictionary<int, Dictionary<string, ConnectionNode>>();
-        private Dictionary<int, Dictionary<string, ConnectionNode>> _inputConnectionNodes = new Dictionary<int, Dictionary<string, ConnectionNode>>();
+        #endregion
 
-        public StateDrawer(Rhythm.State state, int beat, TrackTimeline owner, RhythmSequenceEditor editor)
+        #region Variables :: Variable Nodes
+
+        private Dictionary<int, Dictionary<ConnectionNode, string>> _outputConnectionNodes = new Dictionary<int, Dictionary<ConnectionNode, string>>();
+        private Dictionary<int, Dictionary<ConnectionNode, string>> _inputConnectionNodes = new Dictionary<int, Dictionary<ConnectionNode, string>>();
+        private int _nodeCount = 0;
+
+        private GUISkin _rightAlignSkin;
+
+        #endregion
+
+        #region Initialize
+
+        public StateDrawer(Rhythm.State state, int beat, TrackGUI trackGUI, TimelineGUI timeline, RhythmSequenceEditor editor)
         {
+            _sequenceEditorWindow = editor;
             State = state;
+            _timelineGUI = timeline;
+            TrackGUI = trackGUI;
+
             Beat = beat;
             LengthInBeats = state.LengthInBeats;
 
-            OwningTimeline = owner;
-
-            _editor = editor;
-
-            SetView();
+            //CreateConnectionNodes();
         }
 
+        #endregion
+
+        //private void CreateConnectionNodes()
+        //{
+        //    _nodeCount = 0;
+        //    for (int i = 0; i < _state.Actions.Count; i++)
+        //    {
+        //        //Create serializedObject and prepare for drawing the inspectors
+        //        var so = new SerializedObject(_state.Actions[i]);
+        //        so.Update();
+        //
+        //        SerializedProperty it = so.GetIterator();
+        //        it.NextVisible(true);
+        //
+        //        while (it.NextVisible(false))
+        //        {
+        //            Rhythm.OutputAttribute outputAttribute = it.GetAttributes<Rhythm.OutputAttribute>();
+        //            if (outputAttribute != null)
+        //            {
+        //                if (!_outputConnectionNodes.ContainsKey(i))
+        //                {
+        //                    _outputConnectionNodes.Add(i, new Dictionary<ConnectionNode, string>());
+        //                }
+        //
+        //                _outputConnectionNodes[i].Add(new ConnectionNode(this, EConnectionType.Output, _sequenceEditorWindow), it.propertyPath);
+        //                _nodeCount++;
+        //            }
+        //
+        //            Rhythm.InputAttribute inputAttribute = it.GetAttributes<Rhythm.InputAttribute>();
+        //            if (inputAttribute != null)
+        //            {
+        //                if (!_inputConnectionNodes.ContainsKey(i))
+        //                {
+        //                    _inputConnectionNodes.Add(i, new Dictionary<ConnectionNode, string>());
+        //                }
+        //
+        //                _inputConnectionNodes[i].Add(new ConnectionNode(this, EConnectionType.Input, _sequenceEditorWindow), it.propertyPath);
+        //                _nodeCount++;
+        //            }
+        //        }
+        //    }
+        //}
+        
         public void OnGUI()
         {
-            SetView();
-
             EditorGUI.DrawRect(View, _backgroundColor);
             Utility.DrawShadowRect(View, new Inset(), 5, _shadowColor);
 
-            GUILayout.BeginArea(View);
-
-            //GUILayout.Label(State.Actions.Count.ToString());
-            GUILayout.Label(State.LengthInBeats.ToString());
-            GUILayout.EndArea();
-
-            for(int i = 0; i < State.Actions.Count; i++)
-            {
-                //Create serializedObject and prepare for drawing the inspectors
-                var so = new SerializedObject(State.Actions[i]);
-                so.Update();
-
-                SerializedProperty it = so.GetIterator();
-                it.NextVisible(true);
-
-                while (it.NextVisible(false))
-                {
-                    Rhythm.OutputAttribute outputAttribute = it.GetAttributes<Rhythm.OutputAttribute>();
-                    if (outputAttribute != null)
-                    {
-                        if (!_outputConnectionNodes.ContainsKey(i))
-                            _outputConnectionNodes.Add(i, new Dictionary<string, ConnectionNode>());
-
-                        if (!_outputConnectionNodes[i].ContainsKey(it.propertyPath))
-                            _outputConnectionNodes[i].Add(it.propertyPath, new ConnectionNode(this, EConnectionType.Output));
-
-                        _outputConnectionNodes[i][it.propertyPath].Draw();
-                    }
-
-                    Rhythm.InputAttribute inputAttribute = it.GetAttributes<Rhythm.InputAttribute>();
-                    if (inputAttribute != null)
-                    {
-                        if (!_inputConnectionNodes.ContainsKey(i))
-                            _inputConnectionNodes.Add(i, new Dictionary<string, ConnectionNode>());
-
-                        if (!_inputConnectionNodes[i].ContainsKey(it.propertyPath))
-                            _inputConnectionNodes[i].Add(it.propertyPath, new ConnectionNode(this, EConnectionType.Input));
-
-                        _inputConnectionNodes[i][it.propertyPath].Draw();
-                    }
-                }
-            }
-
+            //Create a box with the size of a connection node, on the first node position possible on this state
+            //Rect nextConnectionNode = new Rect(View.x, View.y + 5f, EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight);
+            //
+            //for (int i = 0; i < _state.Actions.Count; i++)
+            //{
+            //    if (_inputConnectionNodes.ContainsKey(i) || _outputConnectionNodes.ContainsKey(i))
+            //    {
+            //        //Create the rect for the name of the action containing the next few variable nodes
+            //        //The rect should be as wide as the state drawer and as high as a label (with some added offsets to keep it readable
+            //        Rect actionNameRect = nextConnectionNode;
+            //        actionNameRect.x = View.x; 
+            //        actionNameRect.width = View.width;
+            //        actionNameRect.height += 5f;
+            //        GUILayout.BeginArea(actionNameRect, EditorStyles.helpBox);
+            //
+            //        GUI.skin.label.alignment = TextAnchor.MiddleCenter; //Align in the middle of the helpbox
+            //        GUILayout.Label(_state.Actions[i].GetType().Name);
+            //        GUI.skin.label.alignment = TextAnchor.MiddleLeft;
+            //
+            //        GUILayout.EndArea();
+            //
+            //        nextConnectionNode.y = actionNameRect.y + actionNameRect.height; //Move the next node rect to the bottom of the action name
+            //    }
+            //
+            //    if (_inputConnectionNodes.ContainsKey(i))
+            //    {
+            //        //For an input node we put the connection at half the offset inside of the state
+            //        nextConnectionNode.x = View.x + EditorGUIUtility.singleLineHeight * 0.5f;
+            //        foreach (KeyValuePair<ConnectionNode, string> inputNode in _inputConnectionNodes[i])
+            //        {
+            //            inputNode.Key.Draw(nextConnectionNode);
+            //
+            //            Rect nodeNameRect = nextConnectionNode;
+            //            nodeNameRect.x = nextConnectionNode.x + EditorGUIUtility.singleLineHeight + 5f;
+            //            nodeNameRect.width = View.width;
+            //
+            //            GUILayout.BeginArea(nodeNameRect);
+            //
+            //            GUILayout.Label(inputNode.Value);
+            //
+            //            GUILayout.EndArea();
+            //
+            //            nextConnectionNode.y += EditorGUIUtility.singleLineHeight;
+            //        }
+            //    }
+            //
+            //    if (_outputConnectionNodes.ContainsKey(i))
+            //    {
+            //        nextConnectionNode.x = View.x + View.width - EditorGUIUtility.singleLineHeight * 1.5f;
+            //        foreach (KeyValuePair<ConnectionNode, string> outputNode in _outputConnectionNodes[i])
+            //        {
+            //            outputNode.Key.Draw(nextConnectionNode);
+            //
+            //            Rect nodeNameRect = nextConnectionNode;
+            //            nodeNameRect.x = View.x;
+            //            nodeNameRect.width = View.width - EditorGUIUtility.singleLineHeight - (5f * 2f);
+            //
+            //            GUILayout.BeginArea(nodeNameRect);
+            //
+            //            GUI.skin.label.alignment = TextAnchor.MiddleRight;
+            //            GUILayout.Label(outputNode.Value);
+            //            GUI.skin.label.alignment = TextAnchor.MiddleLeft;
+            //
+            //            GUILayout.EndArea();
+            //
+            //            nextConnectionNode.y += EditorGUIUtility.singleLineHeight;
+            //        }
+            //    }
+            //
+            //    nextConnectionNode.y += EditorGUIUtility.singleLineHeight;
+            //}
         }
 
         public void OnGhostGUI()
@@ -112,14 +213,72 @@ namespace RhythmEditor
             
             Beat = beat;
 
-            SetView();
+            TrackGUI.RefreshStatePositionAndSize(this, Beat, State.LengthInBeats);
         }
 
-        public void SetView()
-        {
-            Rect owningView = OwningTimeline.View;
+        public void SetView(Rect view)
+        { 
+            View = view;
+        }
 
-            View = new Rect(OwningTimeline.GetXForBeat(Beat), owningView.y + (1 - STATE_SIZE_PERCENTAGE) * 0.5f * owningView.height, OwningTimeline.WidthPerBeat * LengthInBeats, STATE_SIZE_PERCENTAGE * owningView.height);
+        public void SetPositionAndSize(Vector2 pos, Vector2 size)
+        {
+            Position = pos;
+            Size = size;
+
+            BaseRect = new Rect(Position, Size);
+            View = new Rect(Position, Size);
+        }
+
+        public ConnectionNode GetConnectionNodeForPosition(Vector2 pos, EConnectionType type)
+        {
+            if (type == EConnectionType.Output)
+            {
+                foreach (Dictionary<ConnectionNode, string> propertyToConnectionNodeList in _outputConnectionNodes.Values)
+                {
+                    foreach (ConnectionNode connectionNode in propertyToConnectionNodeList.Keys)
+                    {
+                        if (connectionNode.View.Contains(pos))
+                            return connectionNode;
+                    }
+                }
+            }
+            else
+            {
+                foreach (Dictionary<ConnectionNode, string> propertyToConnectionNodeList in _inputConnectionNodes.Values)
+                {
+                    foreach (ConnectionNode connectionNode in propertyToConnectionNodeList.Keys)
+                    {
+                        if (connectionNode.View.Contains(pos))
+                            return connectionNode;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public SerializedProperty GetPropertyForConnectionNode(ConnectionNode value)
+        {
+            foreach (KeyValuePair<int, Dictionary<ConnectionNode, string>> propertyToConnectionNodeList in _outputConnectionNodes)
+            {
+                if (propertyToConnectionNodeList.Value.ContainsKey(value))
+                    return GetProperty(propertyToConnectionNodeList.Key, propertyToConnectionNodeList.Value[value]);
+            }
+
+            foreach (KeyValuePair<int, Dictionary<ConnectionNode, string>> propertyToConnectionNodeList in _inputConnectionNodes)
+            {
+                if (propertyToConnectionNodeList.Value.ContainsKey(value))
+                    return GetProperty(propertyToConnectionNodeList.Key, propertyToConnectionNodeList.Value[value]);
+            }
+
+            return null;
+        }
+
+        public SerializedProperty GetProperty(int actionid, string path)
+        {
+            SerializedObject so = new SerializedObject(State.Actions[actionid]);
+            return so.FindProperty(path);
         }
 
         #region Resize Handles
@@ -130,13 +289,13 @@ namespace RhythmEditor
 
             if (_box_1 == null)
             {
-                _box_1 = RhythmBeatDragBox.Create(Beat, OwningTimeline, new Vector2(10f, 10f), OnBoxHandleMoved, OnBoxHandleApplied);
+                _box_1 = RhythmBeatDragBox.Create(Beat, _timelineGUI, new Vector2(10f, 10f), OnBoxHandleMoved, OnBoxHandleApplied);
                 Debug.Log("created first box handle");
             }
 
             if (State.LengthInBeats > 0 && _box_2 == null)
             {
-                _box_2 = RhythmBeatDragBox.Create(Beat + State.LengthInBeats, OwningTimeline, new Vector2(10f, 10f), OnBoxHandleMoved, OnBoxHandleApplied);
+                _box_2 = RhythmBeatDragBox.Create(Beat + State.LengthInBeats, _timelineGUI, new Vector2(10f, 10f), OnBoxHandleMoved, OnBoxHandleApplied);
                 Debug.Log("created second box handle");
             }
         }
@@ -176,13 +335,13 @@ namespace RhythmEditor
 
             Debug.Log(Beat + ", " + State.LengthInBeats);
 
-            SetView();
+            TrackGUI.RefreshStatePositionAndSize(this, Beat, State.LengthInBeats);
         }
 
         private void OnBoxHandleApplied()
         {
-            RhythmToolStateMoveAction newChange = new RhythmToolStateMoveAction(this, OwningTimeline, _ghost.OwningTimeline, Beat, _ghost.Beat, LengthInBeats, _ghost.LengthInBeats);
-            _editor.RecordChange(newChange);
+            RhythmToolStateMoveAction newChange = new RhythmToolStateMoveAction(this, TrackGUI, _ghost.TrackGUI, Beat, _ghost.Beat, LengthInBeats, _ghost.LengthInBeats);
+            _sequenceEditorWindow.RecordChange(newChange);
 
             ApplyGhost(false);
         }
@@ -200,18 +359,18 @@ namespace RhythmEditor
                 return;
             }
 
-            _ghost = new StateDrawer(State, Beat, OwningTimeline, _editor);
+            _ghost = new StateDrawer(State, Beat, TrackGUI, _timelineGUI, _sequenceEditorWindow);
             _ghost._backgroundColor.a *= .5f;
         }
 
-        public void MoveGhost(TrackTimeline timeline, int beat)
+        public void MoveGhost(TrackGUI timeline, int beat)
         {
             if (_ghost != null)
             {
-                _ghost.OwningTimeline = timeline;
+                _ghost.TrackGUI = timeline;
                 _ghost.Beat = beat;
 
-                _ghost.SetView();
+                TrackGUI.RefreshStatePositionAndSize(_ghost, beat, State.LengthInBeats);
             }
         }
 
@@ -220,7 +379,7 @@ namespace RhythmEditor
             if (_ghost != null)
             {
                 //Check if the position the ghost is occupying is free for another state to move to
-                if (!_ghost.OwningTimeline.IsFree(_ghost.Beat, State))
+                if (!_ghost.TrackGUI.IsFree(_ghost.Beat, State))
                 {
                     //Open error prompt
                     if (EditorUtility.DisplayDialog("Error placing state", "Position on timeline is not free for the state you are about to move"/*, "Create new timeline"*/, "Cancel"))
@@ -233,19 +392,19 @@ namespace RhythmEditor
                     return;
                 }
 
-                if (_ghost.OwningTimeline != OwningTimeline)
+                if (_ghost.TrackGUI != TrackGUI)
                 {
-                    OwningTimeline.RemoveState(Beat);
-                    OwningTimeline = _ghost.OwningTimeline;
+                    TrackGUI.RemoveState(Beat);
+                    TrackGUI = _ghost.TrackGUI;
 
-                    OwningTimeline.AcceptState(this);
-                    SetView();
+                    TrackGUI.AcceptState(this);
+                    TrackGUI.RefreshStatePositionAndSize(this, Beat, State.LengthInBeats);
                 }
 
                 SetBeat(_ghost.Beat);
                 LengthInBeats = _ghost.LengthInBeats;
                 State.LengthInBeats = _ghost.LengthInBeats;
-                _ghost.OwningTimeline.MoveStateTo(State, _ghost.Beat);
+                _ghost.TrackGUI.MoveStateTo(State, _ghost.Beat);
 
                 if (destroyGhost)
                     _ghost = null;

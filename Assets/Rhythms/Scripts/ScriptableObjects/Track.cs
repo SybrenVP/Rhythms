@@ -17,30 +17,26 @@ namespace Rhythm
 
         [HideInInspector, SerializeField] public bool Active = true;
 
-        //Allows us to disable and enable tracks at runtime, kind of like making a choice in a story game
-        public void SetActive(bool active)
-        {
-            Active = active;
-        }
 
-        public void Start()
+        public void OnUpdate(int currentBeat, float beatOffset, AudioData data)
         {
             if (Active)
             {
-                foreach (var state in States)
+                if (beatOffset > 0.5f)
                 {
-                    state.Value.OnTimelineActivate();
-                }
-            }
-        }
+                    currentBeat += 1;
 
-        public void OnUpdate(int currentBeat)
-        {
-            if (Active)
-            {
+                    if (States.ContainsKey(currentBeat - 1)) //Check the previous beat to exit it if necessary
+                    {
+                        //The currentbeat could be the same state as the previous beat in which case we do not need to exit it yet. 
+                        if ((States.ContainsKey(currentBeat) && !States[currentBeat].Active) || !States.ContainsKey(currentBeat))
+                            States[currentBeat - 1].ExitState();
+                    }
+                }
+
                 if (States.ContainsKey(currentBeat))
                 {
-                    States[currentBeat].OnUpdate();
+                    States[currentBeat].OnUpdate(currentBeat, data);
                 }
             }
         }
@@ -49,19 +45,10 @@ namespace Rhythm
         {
             if (Active)
             {
-                if (States.ContainsKey(currentBeat - 1)) //Check the previous beat to exit it if necessary
-                {
-                    //The currentbeat could be the same state as the previous beat in which case we do not need to exit it yet. 
-                    if (States.ContainsKey(currentBeat) && !States[currentBeat].Active)
-                        States[currentBeat - 1].ExitState();
-                }
-
                 if (States.ContainsKey(currentBeat))
                 {
                     States[currentBeat].OnBeatUpdate();
                 }
-
-                
             }
         }
 

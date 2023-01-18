@@ -33,5 +33,10 @@ namespace Rhythm
         {
             get => (int)(BeatPerSec * Song.length);
         }
+
+        public float SongOffsetInBeats
+        {
+            get => SongOffset * BeatPerSec;
+        }
     }
 }

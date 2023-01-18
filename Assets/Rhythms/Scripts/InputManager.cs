@@ -63,4 +63,20 @@ public class InputManager : MonoBehaviour
 
         KeyUpEvent[key].Add(keyEvent);
     }
+
+    public void RemoveKeyDown(KeyCode key, OnKeyEvent keyEvent)
+    {
+        if (KeyDownEvent.ContainsKey(key))
+        {
+            KeyDownEvent[key].Remove(keyEvent);
+        }
+    }
+
+    public void RemoveKeyUp(KeyCode key, OnKeyEvent keyEvent)
+    {
+        if (KeyUpEvent.ContainsKey(key))
+        {
+            KeyUpEvent[key].Remove(keyEvent);
+        }
+    }
 }

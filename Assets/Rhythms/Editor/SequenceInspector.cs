@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using Rhythm;
 
 namespace RhythmEditor
 {
@@ -32,10 +33,10 @@ namespace RhythmEditor
             Sequence = sequence;
             _editor = editor;
 
-            //Create a GUIStyle with toolbar not centered text
-            _variableNameStyle = new GUIStyle(EditorStyles.toolbarButton) { alignment = TextAnchor.MiddleLeft };
-
             _actionMenuContent = EditorGUIUtility.IconContent("_Menu");
+
+            //Create a GUIStyle with toolbar not centered text
+            
         }
 
         public void OnGUI()
@@ -196,6 +197,11 @@ namespace RhythmEditor
 
         private void DrawVariableInspector()
         {
+            if (Sequence.Variables == null)
+            {
+                Sequence.Variables = ScriptableObject.CreateInstance<SequenceVariables>();
+            }
+
             if (Sequence.Variables.Variables == null || Sequence.Variables.Variables.Length == 0)
             {
                 Sequence.Variables.Init();
@@ -242,6 +248,9 @@ namespace RhythmEditor
                 }
                 else
                 {
+                    if (_variableNameStyle == null)
+                        _variableNameStyle = new GUIStyle(EditorStyles.toolbarButton) { alignment = TextAnchor.MiddleLeft };
+
                     var.EditingValue = GUILayout.Toggle(var.EditingValue, var.name, _variableNameStyle); 
                 }
                 

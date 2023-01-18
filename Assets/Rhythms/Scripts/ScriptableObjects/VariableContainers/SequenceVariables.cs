@@ -155,7 +155,7 @@ namespace Rhythm
                 count = _variables.AmountOfVariableOfType(_currentType);
                 _arrayPosition = 0;
 
-                if (count <= 0)
+                if (count < 0)
                     return false;
             }
 
