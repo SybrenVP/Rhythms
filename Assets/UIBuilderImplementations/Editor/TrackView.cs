@@ -25,9 +25,11 @@ public class TrackView : VisualElement
 
     private VisualElement _timelineTimeStampVisual;
 
-    private VisualElement _selectionRect;
-    private Vector2 _start;
-    private Vector2 _end;
+    private StateSelector _stateSelector;
+
+    //private VisualElement _selectionRect;
+    //private Vector2 _start;
+    //private Vector2 _end;
 
     private const float WIDTH_PER_BEAT = 40f;
     private const float LEFT_SPACING = 10f;
@@ -49,10 +51,17 @@ public class TrackView : VisualElement
             int beat = ConvertPositionToBeat(localPos);
             int trackId = ConvertPositionToTrackId(localPos);
             
-            evt.menu.AppendAction("Add State", (a) => CreateState(beat, trackId));
-            List<BehaviourTree> clickedStates = GetStatesForBeat(beat);
+            List<BehaviourTree> clickedStates = GetStates(beat, trackId);
             if (clickedStates.Count > 0)
+            {
                 evt.menu.AppendAction("Remove State", (a) => RemoveStates(clickedStates));
+                evt.menu.AppendSeparator();
+                //evt.menu.AppendAction("Copy", (a) => CopyState(clickedStates));
+                //evt.menu.AppendAction("Cut", (a) => CutState(clickedStates));
+                //evt.menu.AppendAction("Paste", (a) => PasteState(clickedStates));
+            }
+            else
+                evt.menu.AppendAction("Add State", (a) => CreateState(beat, trackId));
         }));
 
         Undo.undoRedoPerformed += OnUndoRedo;
@@ -79,9 +88,6 @@ public class TrackView : VisualElement
             _scrollViewContent.style.width = WIDTH_PER_BEAT * _track.AudioData.AmountBeatsInSong + LEFT_SPACING + RIGHT_SPACING;
             DefineScrollContentHeight();
         }
-        
-        _selectionRect = this.Q<VisualElement>("selectionrect");
-        _selectionRect.visible = false;
 
         CreateBackground();
 
@@ -93,7 +99,7 @@ public class TrackView : VisualElement
             CreateStateView(state);
         }
 
-        _selectionRect.BringToFront();
+        _stateSelector = new StateSelector(this, _scrollViewContent);
     }
 
     private void CreateBackground()
@@ -148,111 +154,28 @@ public class TrackView : VisualElement
 
     #region Selection
 
-    private void OnMouseDrag(MouseMoveEvent evt)
+    public List<StateView> GetRectBasedStateViews(Rect rect)
     {
-        //Update selection rect visual
-        Vector2 localPos = _scrollViewContent.WorldToLocal(evt.mousePosition);
-
-        Vector2 positiveBottomRight = _scrollViewContent.layout.size - localPos;
-        Vector2 negativeBottomRight = _scrollViewContent.layout.size - _start;
-
-        Vector2 diff = localPos - _start;
-
-        if (Mathf.Sign(diff.x) > 0)
-        {
-            _selectionRect.style.left = _start.x;
-            _selectionRect.style.right = positiveBottomRight.x;
-        }
-        else
-        {
-            _selectionRect.style.left = localPos.x;
-            _selectionRect.style.right = negativeBottomRight.x;
-        }
-
-        if (Mathf.Sign(diff.y) > 0)
-        {
-            _selectionRect.style.top = _start.y;
-            _selectionRect.style.bottom = positiveBottomRight.y;
-        }
-        else
-        {
-            _selectionRect.style.top = localPos.y;
-            _selectionRect.style.bottom = negativeBottomRight.y;
-        }
-    }
-
-    private void OnMouseDown(MouseDownEvent evt)
-    {
-        if (evt.button == 0)
-        {
-            Vector2 scrollViewContentPos = _scrollViewContent.WorldToLocal(evt.mousePosition);
-            Vector2 timelineTimePos = _timelineTime.WorldToLocal(evt.mousePosition);
-            if (_scrollViewContent.ContainsPoint(scrollViewContentPos))
-            {
-                _selectionRect.visible = true;
-
-                _start = scrollViewContentPos;
-
-                _selectionRect.style.left = scrollViewContentPos.x;
-                _selectionRect.style.top = scrollViewContentPos.y;
-
-                Vector2 bottomRight = _scrollViewContent.layout.size - scrollViewContentPos;
-                _selectionRect.style.right = bottomRight.x;
-                _selectionRect.style.bottom = bottomRight.y;
-
-                RegisterCallback<MouseMoveEvent>(OnMouseDrag);
-            }
-            else if (_timelineTime.ContainsPoint(timelineTimePos))
-            {
-                _timelineTimeStampVisual.style.left = timelineTimePos.x - _timelineTimeStampVisual.layout.width * 0.5f;
-            }
-        }
-    }
-
-    private void OnMouseUp(MouseUpEvent evt)
-    {
-        if (evt.button == 0)
-        {
-            _end = _scrollViewContent.WorldToLocal(evt.mousePosition);
-            RemoveSelectionRect();
-        }
-    }
-
-    private void OnMouseLeave(MouseLeaveEvent evt)
-    {
-        _end = _scrollViewContent.WorldToLocal(evt.mousePosition);
-        RemoveSelectionRect();
-    }
-
-    private void RemoveSelectionRect()
-    {
-        //TODO: Gather all selected StateViews
-
+        List<StateView> stateViews = new List<StateView>();
         foreach (StateView state in _stateViews)
-        { 
-            if (state.layout.Overlaps(_selectionRect.layout))
+        {
+            if (state.layout.Overlaps(rect))
             {
-                OnStateSelected?.Invoke(state);
+                stateViews.Add(state);
             }
         }
 
-        _selectionRect.visible = false;
-
-        UnregisterCallback<MouseMoveEvent>(OnMouseDrag);
+        return stateViews;
     }
 
     public void DisableSelection()
     {
-        UnregisterCallback<MouseDownEvent>(OnMouseDown);
-        UnregisterCallback<MouseUpEvent>(OnMouseUp);
-        UnregisterCallback<MouseLeaveEvent>(OnMouseLeave);
+        _stateSelector.DisableSelection();
     }
 
     public void EnableSelection()
     {
-        RegisterCallback<MouseDownEvent>(OnMouseDown);
-        RegisterCallback<MouseUpEvent>(OnMouseUp);
-        RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
+        _stateSelector.EnableSelection();
     }
 
     #endregion
@@ -341,16 +264,18 @@ public class TrackView : VisualElement
         _scrollViewContent.style.height = (HEIGHT_PER_TRACK * _track.AmountOfTracks) + TOP_SPACING + BOTTOM_SPACING;
     }
 
-    private List<BehaviourTree> GetStatesForBeat(int beat)
+    private List<BehaviourTree> GetStates(int beat, int trackId)
     {
         List<BehaviourTree> states = new List<BehaviourTree>();
-        foreach (BehaviourTree state in _track.States)
+
+        foreach (StateView state in _stateViews)
         {
-            if (state.Beat == beat)
+            if (state.State.Beat == beat && Mathf.Abs(state.style.top.value.value - ConvertTrackIdToPosition(trackId)) < Mathf.Epsilon)
             {
-                states.Add(state);
+                states.Add(state.State);
             }
         }
+
         return states;
     }
 
@@ -375,7 +300,8 @@ public class TrackView : VisualElement
         BehaviourTree state = _track.CreateState(beat);
         state.Position = new Vector2(ConvertBeatToPosition(beat), ConvertTrackIdToPosition(trackId));
         CreateStateView(state);
-        _selectionRect.BringToFront();
+
+        //TODO: _selectionRect.BringToFront();
     }
 
     private void CreateStateView(BehaviourTree state)

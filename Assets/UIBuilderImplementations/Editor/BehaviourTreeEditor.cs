@@ -125,6 +125,7 @@ public class BehaviourTreeEditor : EditorWindow, ISupportsOverlays
     private void OnStateSelectionChanged(StateView stateView)
     {
         _treeView.UpdateSelected(stateView);
+        _inspectorView.UpdateSelected(stateView);
     }
 
     public void ToolChange(ToolbarView.EToolType prevType, ToolbarView.EToolType newType)

@@ -30,6 +30,8 @@ public class StateView : VisualElement
 
     #endregion
 
+    private bool _isSelected = false;
+
     public StateView(BehaviourTree state, TrackView track)
     {
         State = state;
@@ -133,6 +135,9 @@ public class StateView : VisualElement
 
         State.Position.x = xPos;
         State.Position.y = yPos;
+
+        State.Beat = beat;
+        //A save might be necessary
     }
 
     private void StopDraggingStateView()
@@ -149,6 +154,9 @@ public class StateView : VisualElement
         RegisterCallback<MouseMoveEvent>(OnMouseMove);
         RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
         parent.RegisterCallback<MouseLeaveEvent>(OnMouseLeaveParent);
+
+        if (_isSelected)
+            _dragState = EDragState.Ready;
     }
 
     public void DisableMove()
@@ -163,6 +171,7 @@ public class StateView : VisualElement
 
     public void Select()
     {
+        _isSelected = true;
         OnStateSelected?.Invoke(this);
     }
 
