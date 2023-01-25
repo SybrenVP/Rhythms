@@ -10,6 +10,7 @@ public class Track : ScriptableObject
     public List<BehaviourTree> States = new List<BehaviourTree>();
 
     public AudioData AudioData;
+    public int AmountOfTracks = 1;
 
     public void Update()
     {

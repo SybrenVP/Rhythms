@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace RhythmEditor
 {
-
+    
     public class Toolbar
     {
         public enum ToolType

@@ -1,16 +1,17 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <Style src="project://database/Assets/UIBuilderImplementations/Editor/BehaviourTreeEditor.uss?fileID=7433441132597879392&amp;guid=6891bd9f90cc50f4594d9ebad5843d99&amp;type=3#BehaviourTreeEditor" />
-    <uie:Toolbar>
-        <uie:ToolbarMenu display-tooltip-when-elided="true" text="Assets" />
-    </uie:Toolbar>
-    <SplitView fixed-pane-initial-dimension="150" orientation="Vertical">
+    <SplitView fixed-pane-initial-dimension="155" orientation="Vertical">
         <ui:VisualElement name="Top-panel">
-            <ui:VisualElement name="trackView" style="flex-grow: 1; position: relative;">
+            <ui:VisualElement name="trackView" style="flex-grow: 1; position: relative; min-height: 179px;">
                 <ui:Label text="TrackView" display-tooltip-when-elided="true" style="background-color: rgb(37, 37, 37);" />
                 <TrackView name="TrackView" style="flex-grow: 1; flex-direction: column; background-color: rgb(41, 41, 41);">
-                    <ui:ScrollView style="flex-grow: 1;">
-                        <ui:VisualElement name="scrollview-content" style="flex-grow: 1;" />
-                        <ui:IMGUIContainer style="background-color: rgb(55, 55, 55); left: 0; top: 0; right: 100%; bottom: 20%; flex-grow: 0; width: 100%; height: 24px; border-left-color: rgb(35, 35, 35); border-right-color: rgb(35, 35, 35); border-top-color: rgb(35, 35, 35); border-bottom-color: rgb(35, 35, 35); border-bottom-width: 3px;" />
+                    <ui:ScrollView style="flex-grow: 1; justify-content: flex-end; align-items: stretch;">
+                        <ui:IMGUIContainer style="background-color: rgb(55, 55, 55); left: 0; top: 0; right: 100%; bottom: 20%; flex-grow: 0; width: 100%; height: 24px; border-left-color: rgb(35, 35, 35); border-right-color: rgb(35, 35, 35); border-top-color: rgb(35, 35, 35); border-bottom-color: rgb(35, 35, 35); border-bottom-width: 3px; flex-shrink: 0;">
+                            <ui:VisualElement name="DraggerVisual" style="background-image: url(&apos;project://database/Packages/com.unity.timeline/Editor/StyleSheets/Images/DarkSkin/TimelineTimeCursor.png?fileID=2800000&amp;guid=3b9e9b3d9ade166499e7a17109ca73bf&amp;type=3#TimelineTimeCursor&apos;); width: 11px; height: 20px;" />
+                        </ui:IMGUIContainer>
+                        <ui:VisualElement name="scrollview-content" style="flex-direction: row; flex-shrink: 0; flex-grow: 1; min-height: 100px; width: 1916px; height: 140px;">
+                            <ui:VisualElement name="selectionrect" picking-mode="Ignore" />
+                        </ui:VisualElement>
                     </ui:ScrollView>
                 </TrackView>
             </ui:VisualElement>

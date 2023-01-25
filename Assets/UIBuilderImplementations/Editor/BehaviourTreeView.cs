@@ -40,12 +40,21 @@ public class BehaviourTreeView : GraphView
         return GetNodeByGuid(node.Guid) as NodeView;
     }
 
+    public void UpdateSelected(StateView state)
+    {
+        PopulateView(state?.State);
+    }
+
     internal void PopulateView(BehaviourTree tree)
     {
         this._tree = tree;
 
         graphViewChanged -= OnGraphViewChanged;
         DeleteElements(graphElements);
+
+        if (_tree == null)
+            return; //We wait here, because no graph changes can happen when there's no state selected currently
+        
         graphViewChanged += OnGraphViewChanged;
 
         if (_tree.RootNode == null)

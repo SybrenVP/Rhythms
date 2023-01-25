@@ -2,9 +2,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.Callbacks;
+using UnityEditor.Overlays;
 
-
-public class BehaviourTreeEditor : EditorWindow
+public class BehaviourTreeEditor : EditorWindow, ISupportsOverlays
 {
     private BehaviourTreeView _treeView;
     private InspectorView _inspectorView;
@@ -62,7 +62,7 @@ public class BehaviourTreeEditor : EditorWindow
         //    _treeObject.ApplyModifiedProperties();
         //};
 
-
+        ToolChange(ToolbarView.EToolType.Select, ToolbarView.EToolType.Select);
         OnSelectionChange();
     }
 
@@ -124,7 +124,40 @@ public class BehaviourTreeEditor : EditorWindow
 
     private void OnStateSelectionChanged(StateView stateView)
     {
-        //TODO: _treeView.UpdateSelected(stateView);
+        _treeView.UpdateSelected(stateView);
+    }
+
+    public void ToolChange(ToolbarView.EToolType prevType, ToolbarView.EToolType newType)
+    {
+        switch (prevType)
+        {
+            case ToolbarView.EToolType.Select:
+                _trackView.DisableSelection();
+                break;
+
+            case ToolbarView.EToolType.Move:
+                _trackView.DisableMove();
+                break;
+
+            case ToolbarView.EToolType.Resize:
+
+                break;
+        }
+
+        switch (newType)
+        {
+            case ToolbarView.EToolType.Select:
+                _trackView.EnableSelection();
+                break;
+
+            case ToolbarView.EToolType.Move:
+                _trackView.EnableMove();
+                break;
+
+            case ToolbarView.EToolType.Resize:
+
+                break;
+        }
     }
 
     private void OnInspectorUpdate()

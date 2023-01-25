@@ -1,8 +1,30 @@
-GridBackground
-{
-	--grid-background-color: rgb(40, 40, 40);
-	--line-color: rgba(193, 196, 192, 0.1);
-	--thick-line-color: rgba(193, 196, 192, 0.1);
-	--spacing: 15;
+#selectionrect {
+    background-color: rgba(183, 183, 183, 0.51);
+    border-left-color: rgb(229, 215, 83);
+    border-right-color: rgb(229, 215, 83);
+    border-top-color: rgb(229, 215, 83);
+    border-bottom-color: rgb(229, 215, 83);
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    position: absolute;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+}
 
+.composite #selectionrect {
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+}
+
+GridBackground {
+    --grid-background-color: rgb(40, 40, 40);
+    --line-color: rgba(193, 196, 192, 0.1);
+    --thick-line-color: rgba(193, 196, 192, 0.1);
+    --spacing: 15;
 }

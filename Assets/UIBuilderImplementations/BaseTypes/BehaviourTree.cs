@@ -18,6 +18,7 @@ public class BehaviourTree : ScriptableObject
     public Blackboard Blackboard = new Blackboard();
 
     public int Beat = -1;
+    [HideInInspector] public Vector2 Position;
 
     public Node.State Update()
     {
